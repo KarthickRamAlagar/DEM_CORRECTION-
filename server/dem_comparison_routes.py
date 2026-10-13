@@ -270,8 +270,8 @@ def get_dem_comparison(year: int):
             "east": bounds.right, "north": bounds.top,
         },
         "note": (
-            f"Correction validated using real ICESat-2 ground truth "
-            f"via 5-fold spatial cross-validation."
+            f"Correction validated against ICESat-2 reference elevations using spatially "
+            f"held-out longitude strips (no test location is near any training location)."
         ),
     }
     _cache[cache_key] = result
@@ -294,10 +294,9 @@ ERROR_THRESHOLD_M = 3.0  # a point counts as "significant error" beyond this - r
 @router.get("/error-points/{year}")
 def get_error_points(year: int, sample_size: int = 400):
     """
-    Real per-point validation for the dashboard view: samples real
-    points from the golden dataset, computes each point's REAL old
-    error (already known) and REAL new error after correction (using
-    the actual saved model) - genuine numbers, not made-up stats.
+    Per-point validation for the dashboard view. Uses OUT-OF-FOLD predictions
+    (each point is predicted by a model that never saw that point's longitude
+    strip), so the numbers are honest, not in-sample.
 
     NEW error is computed as: old_error - predicted_correction. This
     works without needing the true reference elevation stored
@@ -305,48 +304,29 @@ def get_error_points(year: int, sample_size: int = 400):
     what we need - verified algebraically before use.
     """
     import pandas as pd
-    from model.predict import predict_elevation_error
-    from model.helpers.feature_selection import get_model_features, get_target_column
-
-    golden_path = DATA_FINAL / "golden_dataset.parquet"
-    if not golden_path.exists():
-        raise HTTPException(status_code=404, detail="Golden dataset not found")
-
-    features = get_model_features()
-    target = get_target_column()
-    df = pd.read_parquet(golden_path, columns=["latitude", "longitude", target] + features)
+    oof_path = Path(__file__).parent.parent / "model" / "saved" / "oof_predictions.parquet"   # adjust if your layout differs
+    if not oof_path.exists():
+        raise HTTPException(status_code=404, detail="Out-of-fold predictions not found - run model/training/make_oof_v2.py")
+    df = pd.read_parquet(oof_path)
     sample = df.sample(n=min(sample_size, len(df)), random_state=42)
-
     points = []
-    for _, row in sample.iterrows():
-        old_error = float(row[target])
-        feature_values = {f: row[f] for f in features if pd.notna(row[f])}
-        result = predict_elevation_error(feature_values)
-        new_error = old_error - result["predicted_error"]
-
+    for row in sample.itertuples(index=False):
+        old_error = float(row.elevation_error_signed)
+        new_error = old_error - float(row.oof_pred)          # same algebra as before: ref - (raw + predicted)
         points.append({
-            "lat": float(row["latitude"]),
-            "lng": float(row["longitude"]),
-            "old_error": round(old_error, 2),
-            "new_error": round(new_error, 2),
+            "lat": float(row.latitude), "lng": float(row.longitude),
+            "old_error": round(old_error, 2), "new_error": round(new_error, 2),
             "was_error_point": abs(old_error) > ERROR_THRESHOLD_M,
             "is_corrected": abs(old_error) > ERROR_THRESHOLD_M and abs(new_error) <= ERROR_THRESHOLD_M,
         })
-
     total_error_points = sum(1 for p in points if p["was_error_point"])
     corrected_points = sum(1 for p in points if p["is_corrected"])
     remaining_error_points = sum(1 for p in points if p["was_error_point"] and not p["is_corrected"])
-    avg_correction = (
-        sum(p["new_error"] - p["old_error"] for p in points) / len(points) if points else 0
-    )
-
+    avg_correction = sum(p["new_error"] - p["old_error"] for p in points) / len(points) if points else 0
     return {
-        "year": year,
-        "threshold_m": ERROR_THRESHOLD_M,
-        "total_error_points": total_error_points,
-        "corrected_points": corrected_points,
-        "remaining_error_points": remaining_error_points,
+        "year": year, "threshold_m": ERROR_THRESHOLD_M, "total_error_points": total_error_points,
+        "corrected_points": corrected_points, "remaining_error_points": remaining_error_points,
         "reduction_pct": round(100 * corrected_points / total_error_points, 1) if total_error_points else 0,
-        "avg_correction_m": round(avg_correction, 2),
-        "points": points,
+        "avg_correction_m": round(avg_correction, 2), "points": points,
+        "evaluation": "out-of-fold (spatially held-out) predictions",
     }

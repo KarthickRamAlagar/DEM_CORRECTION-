@@ -36,6 +36,7 @@ from .ask_routes import router as ask_router
 from .dem_comparison_routes import router as dem_comparison_router
 from .predict_routes import router as predict_router
 from .describe_it_routes import router as describe_it_router
+from .model_info_routes import router as model_info_router
 
 app = FastAPI(title="DEM Correction - TLE Proxy + EDA API")
 
@@ -45,6 +46,7 @@ app.include_router(ask_router)
 app.include_router(dem_comparison_router)
 app.include_router(predict_router)
 app.include_router(describe_it_router)
+app.include_router(model_info_router)
 
 # Allow your Vite dev server to call this API during development
 app.add_middleware(

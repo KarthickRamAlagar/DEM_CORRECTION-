@@ -28,6 +28,9 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from dem_correction.config import DATA_FINAL, DATA_INTERIM
 
+sys.path.insert(0, str(Path(__file__).parent))
+from predict_v2 import v2_available, predict_frame, _load_artifact as _load_v2   # v2 model if its file exists, else legacy
+
 MODEL_PATH = Path(__file__).parent / "saved" / "dem_correction_model.pkl"
 OUTPUT_DIR = DATA_FINAL / "corrected_rasters"
 TILE_SIZE = 1024
@@ -121,10 +124,16 @@ def main():
     band_index = {name: i for i, name in enumerate(RASTER_BAND_ORDER)}
 
     print(f"\nLoading model...")
-    artifact = joblib.load(MODEL_PATH)
+    use_v2 = v2_available()
+    if use_v2:
+        artifact = _load_v2()
+        print(f"  Using model {artifact['model_version']} (v2)")
+    else:
+        artifact = joblib.load(MODEL_PATH)
+        print("  v2 model file not found - using the legacy model")
     feature_order = artifact["feature_order"]
     medians = artifact["imputation_medians"]
-    w = artifact["meta_weights"]
+    w = artifact.get("meta_weights")
 
     with rasterio.open(raster_path) as src:
         height, width = src.height, src.width
@@ -179,28 +188,32 @@ def main():
                 relative_humidity = np.full((tile_h, tile_w), atm["relative_humidity_pct"], dtype=np.float32)
 
                 ndwi_tile = tile_stack[band_index["ndwi"]]
-                distance_to_water = compute_distance_to_water(ndwi_tile, pixel_size_km)
+                # legacy-only inputs: the v2 model does not use them, so skip the slow distance transform
+                distance_to_water = None if use_v2 else compute_distance_to_water(ndwi_tile, pixel_size_km)
 
-                tri_tile = tile_stack[band_index["tri"]]
-                total_weight = sum(UNCERTAINTY_WEIGHTS.values())
-                uncertainty_score = (
-                    UNCERTAINTY_WEIGHTS["tri"] * normalize_with_global_stats(
-                        tri_tile, _global_stats["tri_min"], _global_stats["tri_max"])
-                    + UNCERTAINTY_WEIGHTS["spatial_autocorrelation_moran"] * normalize_with_global_stats(
-                        spatial_moran, _global_stats["moran_min"], _global_stats["moran_max"])
-                    + UNCERTAINTY_WEIGHTS["terrain_region_class"] * terrain_region_class
-                    + UNCERTAINTY_WEIGHTS["distance_to_water_km"] * normalize_with_global_stats(
-                        distance_to_water, _global_stats["dist_water_min"], _global_stats["dist_water_max"])
-                ) / total_weight
+                if use_v2:
+                    computed_features = {"terrain_region_class": terrain_region_class}
+                else:
+                    tri_tile = tile_stack[band_index["tri"]]
+                    total_weight = sum(UNCERTAINTY_WEIGHTS.values())
+                    uncertainty_score = (
+                        UNCERTAINTY_WEIGHTS["tri"] * normalize_with_global_stats(
+                            tri_tile, _global_stats["tri_min"], _global_stats["tri_max"])
+                        + UNCERTAINTY_WEIGHTS["spatial_autocorrelation_moran"] * normalize_with_global_stats(
+                            spatial_moran, _global_stats["moran_min"], _global_stats["moran_max"])
+                        + UNCERTAINTY_WEIGHTS["terrain_region_class"] * terrain_region_class
+                        + UNCERTAINTY_WEIGHTS["distance_to_water_km"] * normalize_with_global_stats(
+                            distance_to_water, _global_stats["dist_water_min"], _global_stats["dist_water_max"])
+                    ) / total_weight
 
-                computed_features = {
-                    "terrain_region_class": terrain_region_class,
-                    "atmospheric_pressure_kpa": atmospheric_pressure,
-                    "relative_humidity_pct": relative_humidity,
-                    "distance_to_water_km": distance_to_water,
-                    "spatial_autocorrelation_moran": spatial_moran,
-                    "uncertainty_estimate": uncertainty_score,
-                }
+                    computed_features = {
+                        "terrain_region_class": terrain_region_class,
+                        "atmospheric_pressure_kpa": atmospheric_pressure,
+                        "relative_humidity_pct": relative_humidity,
+                        "distance_to_water_km": distance_to_water,
+                        "spatial_autocorrelation_moran": spatial_moran,
+                        "uncertainty_estimate": uncertainty_score,
+                    }
 
                 n_pixels = tile_h * tile_w
                 feature_matrix = np.zeros((n_pixels, len(feature_order)), dtype=np.float32)
@@ -211,15 +224,17 @@ def main():
                         feature_matrix[:, i] = computed_features[feature].flatten()
 
                 X = pd.DataFrame(feature_matrix, columns=feature_order)
-                X_imputed = X.fillna(medians)
-
-                pred_ridge = artifact["ridge_model"].predict(X_imputed)
-                pred_lgbm = artifact["lgbm_model"].predict(X)
-                pred_catboost = artifact["catboost_model"].predict(X)
-                predicted_error = (
-                    w["ridge"] * pred_ridge + w["lgbm"] * pred_lgbm
-                    + w["catboost"] * pred_catboost + w["intercept"]
-                ).reshape(tile_h, tile_w)
+                if use_v2:
+                    predicted_error = predict_frame(X).reshape(tile_h, tile_w)
+                else:
+                    X_imputed = X.fillna(medians)
+                    pred_ridge = artifact["ridge_model"].predict(X_imputed)
+                    pred_lgbm = artifact["lgbm_model"].predict(X)
+                    pred_catboost = artifact["catboost_model"].predict(X)
+                    predicted_error = (
+                        w["ridge"] * pred_ridge + w["lgbm"] * pred_lgbm
+                        + w["catboost"] * pred_catboost + w["intercept"]
+                    ).reshape(tile_h, tile_w)
 
                 raw_z_tile = tile_stack[band_index["raw_z"]]
                 corrected_tile = raw_z_tile + predicted_error

@@ -23,7 +23,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "model"))
-from predict import predict_elevation_error, _load_artifact
+from predict_v2 import predict_elevation_error, _load_artifact, v2_available   # v2 falls back to the old model if its file is missing
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from dem_correction.config import DATA_INTERIM
@@ -97,40 +97,53 @@ def predict_area(request: AreaPredictRequest):
         for feature, idx in band_index.items():
             point_values[feature] = float(small_stack[idx, center_r, center_c])
 
-        raw_z_patch = small_stack[band_index["raw_z"]]
-        global_mean = float(np.nanmean(raw_z_patch))
-        z = raw_z_patch - global_mean
-        m2 = float(np.nanmean(z ** 2)) or 1e-6
-        kernel = np.ones((3, 3))
-        kernel[1, 1] = 0
-        neighbor_mean_z = ndimage.convolve(z, kernel, mode="nearest")[center_r, center_c] / 8
-        point_values["spatial_autocorrelation_moran"] = float((z[center_r, center_c] / m2) * neighbor_mean_z)
-
         point_values["terrain_region_class"] = 1.0 if request.latitude >= 27.0 else 0.0
-        point_values.update(ATMOSPHERIC_CONSTANTS)
 
-        ndwi_val = point_values["ndwi"]
-        point_values["distance_to_water_km"] = 0.0 if ndwi_val > 0 else 5.0
-
-        uncertainty_weights = {"tri": 0.4577, "spatial_autocorrelation_moran": 0.2687,
-                                "terrain_region_class": 0.1028, "distance_to_water_km": 0.0744}
-        total_weight = sum(uncertainty_weights.values())
-        point_values["uncertainty_estimate"] = sum(
-            uncertainty_weights[f] * min(1.0, max(0.0, point_values[f] / 10)) for f in uncertainty_weights
-        ) / total_weight
+        if not v2_available():
+            # LEGACY PATH (old model only): these derived inputs are not used by the v2 model.
+            raw_z_patch = small_stack[band_index["raw_z"]]
+            global_mean = float(np.nanmean(raw_z_patch))
+            z = raw_z_patch - global_mean
+            m2 = float(np.nanmean(z ** 2)) or 1e-6
+            kernel = np.ones((3, 3))
+            kernel[1, 1] = 0
+            neighbor_mean_z = ndimage.convolve(z, kernel, mode="nearest")[center_r, center_c] / 8
+            point_values["spatial_autocorrelation_moran"] = float((z[center_r, center_c] / m2) * neighbor_mean_z)
+            point_values.update(ATMOSPHERIC_CONSTANTS)
+            ndwi_val = point_values["ndwi"]
+            point_values["distance_to_water_km"] = 0.0 if ndwi_val > 0 else 5.0
+            uncertainty_weights = {"tri": 0.4577, "spatial_autocorrelation_moran": 0.2687,
+                                    "terrain_region_class": 0.1028, "distance_to_water_km": 0.0744}
+            total_weight = sum(uncertainty_weights.values())
+            point_values["uncertainty_estimate"] = sum(
+                uncertainty_weights[f] * min(1.0, max(0.0, point_values[f] / 10)) for f in uncertainty_weights
+            ) / total_weight
 
     result = predict_elevation_error(point_values)
 
-    return {
+    if "interval_half_width_m" in result:       # v2 model: risk comes from the terrain-aware interval width
+        half = result["interval_half_width_m"]
+        risk = "Low" if half < 3 else "Medium" if half < 5 else "High"
+    else:                                         # legacy model
+        risk = risk_label(point_values["uncertainty_estimate"])
+
+    response = {
         "latitude": request.latitude,
         "longitude": request.longitude,
         "raw_elevation": point_values["raw_z"],
         "predicted_correction": result["predicted_error"],
         "corrected_elevation": point_values["raw_z"] + result["predicted_error"],
-        "risk_level": risk_label(point_values["uncertainty_estimate"]),
+        "risk_level": risk,
         "is_reliable": result["is_reliable"],
         "message": (
-            f"This area shows {risk_label(point_values['uncertainty_estimate']).lower()} elevation "
-            f"uncertainty. Corrected elevation supports flood-risk and landslide-risk mapping here."
+            f"This area shows {risk.lower()} elevation uncertainty. "
+            f"Corrected elevation is a model estimate - see the uncertainty range before using it for planning."
         ),
     }
+    for k in ("interval_lower", "interval_upper", "model_version"):   # additive fields (v2 only)
+        if k in result:
+            response[k] = result[k]
+    if "interval_lower" in result:
+        response["corrected_interval"] = [point_values["raw_z"] + result["interval_lower"],
+                                          point_values["raw_z"] + result["interval_upper"]]
+    return response
