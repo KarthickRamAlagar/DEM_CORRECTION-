@@ -1,0 +1,19 @@
+train 892567 frozen test 259260
+winner fit 10 s
+                                                  model       n    RMSE     MAE   MedAE    LE90    Bias  RMSE_nonvoid  RMSE_plains  RMSE_foothill
+0                               Raw DEM (no correction)  259260  6.0677  3.1828  1.7920  5.9652 -2.9311        3.2868       2.4566         9.2801
+1                              Constant bias correction  259260  5.3131  2.7699  1.7378  4.4710  0.0580        2.6965       2.1961         8.1067
+2  Current production recipe (Ridge+LGBM+CatBoost, F29)  259260  4.2007  2.1464  1.3207  4.0420  0.2787        2.5289       2.1673         6.1956
+3                                                 Ridge  259260  4.4671  2.3381  1.4835  4.1368  0.4818        2.7333       2.1628         6.6650
+4                                           LightGBM v1  259260  4.1810  2.2891  1.5151  4.2278 -0.0316        2.7818       2.2498         6.1133
+5                                           CatBoost v1  259260  4.1536  2.2905  1.5689  4.1267  0.0355        2.7194       2.1807         6.1047
+6                             WINNER: LightGBM_L2_tuned  259260  4.0556  2.1335  1.3938  3.9078  0.0021        2.5160       2.0494         6.0053
+7                        Avg(Ridge,LGBM_L2) [reference]  259260  4.1784  2.0892  1.2433  3.9304  0.2419        2.5043       2.0840         6.2021
+90% interval coverage on frozen strip: 0.8554 | mean half-width 3.629
+  group 0 (region 0, tri tercile 0): q90=2.34 n_frozen=70835 coverage=0.837
+  group 1 (region 0, tri tercile 1): q90=2.52 n_frozen=48199 coverage=0.848
+  group 2 (region 0, tri tercile 2): q90=3.06 n_frozen=40573 coverage=0.853
+  group 3 (region 1, tri tercile 0): q90=3.32 n_frozen=34053 coverage=0.954
+  group 4 (region 1, tri tercile 1): q90=3.30 n_frozen=22987 coverage=0.920
+  group 5 (region 1, tri tercile 2): q90=8.00 n_frozen=42613 coverage=0.783
+DONE

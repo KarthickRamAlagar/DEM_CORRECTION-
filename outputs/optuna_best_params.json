@@ -1,0 +1,26 @@
+{
+  "lgbm_l2": {
+    "n_estimators": 183,
+    "learning_rate": 0.02063005787880737,
+    "num_leaves": 30,
+    "min_child_samples": 181,
+    "reg_lambda": 27.131491172684214,
+    "colsample_bytree": 0.50622103019894,
+    "subsample": 0.8495217128129622,
+    "subsample_freq": 1,
+    "random_state": 42
+  },
+  "lgbm_huber": {
+    "n_estimators": 284,
+    "learning_rate": 0.04411165475663826,
+    "num_leaves": 17,
+    "min_child_samples": 357,
+    "reg_lambda": 15.769577598731784,
+    "colsample_bytree": 0.5020737664743952,
+    "subsample": 0.6113129315442944,
+    "subsample_freq": 1,
+    "random_state": 42,
+    "objective": "huber",
+    "alpha": 3.5708708411176966
+  }
+}

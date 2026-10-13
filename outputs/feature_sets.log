@@ -1,0 +1,49 @@
+/usr/local/lib/python3.13/dist-packages/sklearn/linear_model/_ridge.py:227: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.688599343159126e-12.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/usr/local/lib/python3.13/dist-packages/sklearn/linear_model/_ridge.py:227: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.469590937997923e-12.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/usr/local/lib/python3.13/dist-packages/sklearn/linear_model/_ridge.py:227: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.4297835878733798e-12.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/usr/local/lib/python3.13/dist-packages/sklearn/linear_model/_ridge.py:227: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.619381491222872e-12.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+F43_full Ridge 3.214 2.125 worst fold 5.53
+F43_full LightGBM 3.211 2.392 worst fold 5.35
+/usr/local/lib/python3.13/dist-packages/sklearn/linear_model/_ridge.py:227: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.6918235435796634e-12.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/usr/local/lib/python3.13/dist-packages/sklearn/linear_model/_ridge.py:227: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.479347239667251e-12.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/usr/local/lib/python3.13/dist-packages/sklearn/linear_model/_ridge.py:227: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.4142634506146843e-12.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/usr/local/lib/python3.13/dist-packages/sklearn/linear_model/_ridge.py:227: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.6133385819943067e-12.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+F33_noradar Ridge 3.175 2.092 worst fold 5.44
+F33_noradar LightGBM 3.185 2.36 worst fold 5.23
+/usr/local/lib/python3.13/dist-packages/sklearn/linear_model/_ridge.py:227: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.7055983321810917e-12.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/usr/local/lib/python3.13/dist-packages/sklearn/linear_model/_ridge.py:227: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.455432775508304e-12.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/usr/local/lib/python3.13/dist-packages/sklearn/linear_model/_ridge.py:227: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.418994908895411e-12.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/usr/local/lib/python3.13/dist-packages/sklearn/linear_model/_ridge.py:227: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.6164517601123816e-12.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+F31_nodateproxy Ridge 3.152 2.074 worst fold 5.37
+F31_nodateproxy LightGBM 3.154 2.295 worst fold 5.15
+/usr/local/lib/python3.13/dist-packages/sklearn/linear_model/_ridge.py:227: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.6987943130274417e-12.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/usr/local/lib/python3.13/dist-packages/sklearn/linear_model/_ridge.py:227: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.4736701402516825e-12.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/usr/local/lib/python3.13/dist-packages/sklearn/linear_model/_ridge.py:227: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.4215187147125228e-12.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+/usr/local/lib/python3.13/dist-packages/sklearn/linear_model/_ridge.py:227: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.619646687074262e-12.
+  return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
+F29_parity_safe Ridge 3.117 2.24 worst fold 5.19
+F29_parity_safe LightGBM 3.1 2.244 worst fold 5.12
+          features  n_features      algo   RMSE  RMSE_nonvoid    MAE  MedAE   LE90   Bias  RMSE_plains  RMSE_foothill  worst_fold_RMSE  secs
+0         F43_full          43     Ridge  3.214         2.125  1.622  1.129  3.007 -0.109        1.982          5.067            5.533     2
+1         F43_full          43  LightGBM  3.211         2.392  1.790  1.246  3.653 -0.236        2.123          4.921            5.352    28
+2      F33_noradar          33     Ridge  3.175         2.092  1.608  1.127  2.964 -0.100        1.994          4.973            5.439     2
+3      F33_noradar          33  LightGBM  3.185         2.360  1.747  1.203  3.566 -0.235        2.055          4.933            5.234    25
+4  F31_nodateproxy          31     Ridge  3.152         2.074  1.602  1.125  2.958 -0.100        1.991          4.924            5.369     1
+5  F31_nodateproxy          31  LightGBM  3.154         2.295  1.715  1.191  3.460 -0.199        1.995          4.926            5.150    25
+6  F29_parity_safe          29     Ridge  3.117         2.240  1.619  1.128  3.025 -0.059        1.981          4.858            5.185     1
+7  F29_parity_safe          29  LightGBM  3.100         2.244  1.647  1.129  3.269 -0.174        2.005          4.798            5.124    24

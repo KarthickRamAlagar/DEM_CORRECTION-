@@ -1,0 +1,105 @@
+{
+  "model_version": "v2.0.0",
+  "created_utc": "2026-10-13T17:46:42.929857Z",
+  "algorithm": "LightGBM (Optuna-tuned, L2) on 29 parity-safe features",
+  "target": "elevation_error_signed = elevation_ref - raw_z ; corrected = raw_z + predicted_error",
+  "dataset": {
+    "file": "golden_dataset.parquet",
+    "rows": 1221354,
+    "sha256": "68f29676b28bc0fc4689096aff4344ac2804426aead27c97dd708252f4af871b"
+  },
+  "feature_schema": [
+    "aspect_cos",
+    "aspect_sin",
+    "band_B02",
+    "band_B03",
+    "band_B04",
+    "band_B08",
+    "band_B11",
+    "band_B12",
+    "bsi",
+    "elev_mean_3x3",
+    "elev_std_3x3",
+    "evi",
+    "general_curvature",
+    "hillshade",
+    "ndsi",
+    "ndvi",
+    "ndvi_mean_3x3",
+    "ndwi",
+    "planform_curvature",
+    "profile_curvature",
+    "raw_z",
+    "relative_slope_position",
+    "shadow_index",
+    "slope_deg",
+    "slope_mean_5x5",
+    "slope_std_5x5",
+    "terrain_region_class",
+    "tpi",
+    "tri"
+  ],
+  "hyperparameters": {
+    "n_estimators": 183,
+    "learning_rate": 0.02063005787880737,
+    "num_leaves": 30,
+    "min_child_samples": 181,
+    "reg_lambda": 27.131491172684214,
+    "colsample_bytree": 0.50622103019894,
+    "subsample": 0.8495217128129622,
+    "subsample_freq": 1,
+    "random_state": 42
+  },
+  "validation": {
+    "design": "10 km blocks, 5 km buffer, 5 longitude strips (seed 42); strip 3 frozen final test; selection by 4-strip spatial CV",
+    "cv_4strip_pooled": {
+      "RMSE": 2.9821,
+      "MAE": 1.5518,
+      "MedAE": 1.0756,
+      "LE90": 3.0397,
+      "Bias": -0.2023
+    },
+    "frozen_strip": {
+      "n": 259260.0,
+      "RMSE": 4.0556,
+      "MAE": 2.1335,
+      "MedAE": 1.3938,
+      "LE90": 3.9078,
+      "Bias": 0.0021,
+      "RMSE_nonvoid": 2.516,
+      "RMSE_plains": 2.0494,
+      "RMSE_foothill": 6.0053
+    },
+    "frozen_strip_raw_dem": {
+      "RMSE": 6.0677,
+      "MAE": 3.1828
+    },
+    "frozen_strip_old_recipe": {
+      "RMSE": 4.2007,
+      "MAE": 2.1464
+    },
+    "note": "CV models used a 300k-row training subsample per fold; frozen-strip model used all rows outside strip 3 + buffer; final artifact uses all rows."
+  },
+  "intervals": {
+    "tri_edges": [
+      0.11437395215034483,
+      0.2003646939992904
+    ],
+    "q90": {
+      "0": 2.3400966852299065,
+      "1": 2.5167817387784464,
+      "2": 3.056807367871193,
+      "3": 3.319294613064287,
+      "4": 3.295339335405993,
+      "5": 8.002691939050614
+    },
+    "alpha": 0.1,
+    "calibration": "out-of-fold residuals, 4 CV strips, LightGBM_L2_tuned",
+    "groups": "terrain_region_class*3 + tri tertile"
+  },
+  "selection_rule": "outputs/selection_rule.md",
+  "known_limits": [
+    "Study area is Gangetic Plain with Himalayan foothill margin (lat 25-28N), not high Himalaya",
+    "90% conformal interval covered ~85.5% on the unseen frozen strip (spatial shift); treat as approximate"
+  ]
+}
