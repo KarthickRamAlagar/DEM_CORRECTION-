@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Mic, FileText, Palette, RotateCcw, Info } from "lucide-react";
 import { useSettings } from "../lib/useSettings";
 import { updateSettings, resetSettings } from "../lib/settingsStore";
+
+const MODEL_INFO_URL = "http://localhost:8000/api/model/info";
 
 const NAV_ITEMS = [
   { id: "voice", label: "Voice & Assistant", icon: Mic },
@@ -53,6 +55,16 @@ export default function SettingsPage() {
   const [activeSection, setActiveSection] = useState("voice");
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
+  const [modelInfo, setModelInfo] = useState(null);
+  const [modelInfoError, setModelInfoError] = useState(false);
+
+  // About tab reads the real model facts from the server's registry (nothing hard-coded)
+  useEffect(() => {
+    fetch(MODEL_INFO_URL)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error("bad status"))))
+      .then(setModelInfo)
+      .catch(() => setModelInfoError(true));
+  }, []);
 
   const set = (key, value) => {
     updateSettings({ [key]: value });
@@ -183,9 +195,17 @@ export default function SettingsPage() {
             <SectionCard title="About & System Information">
               <div className="space-y-3 text-[13px]">
                 <div className="flex justify-between"><span className="text-ink-400">Application</span><span className="text-white">DEM-Correction Engine</span></div>
-                <div className="flex justify-between"><span className="text-ink-400">Version</span><span className="text-white font-mono">v1.0.0</span></div>
-                <div className="flex justify-between"><span className="text-ink-400">Prediction Engine</span><span className="text-white">Linear Stacking</span></div>
-                <div className="flex justify-between"><span className="text-ink-400">Base Models</span><span className="text-white">Ridge, LightGBM, CatBoost</span></div>
+                <div className="flex justify-between"><span className="text-ink-400">App Version</span><span className="text-white font-mono">v1.0.0</span></div>
+                <div className="flex justify-between"><span className="text-ink-400">Prediction Engine</span><span className="text-white">{modelInfo ? modelInfo.algorithm : "Tuned LightGBM (v2)"}</span></div>
+                <div className="flex justify-between"><span className="text-ink-400">Model Version</span><span className="text-white font-mono">{modelInfo ? modelInfo.model_version : modelInfoError ? "unavailable (server offline)" : "loading..."}</span></div>
+                <div className="flex justify-between"><span className="text-ink-400">Reference Checks</span><span className="text-white">Ridge, CatBoost (sanity check only)</span></div>
+                {modelInfo && (
+                  <>
+                    <div className="flex justify-between"><span className="text-ink-400">Accuracy on unseen test strip</span><span className="text-white font-mono">{modelInfo.frozen_strip_rmse} m RMSE (raw DEM: {modelInfo.raw_dem_rmse_same_strip} m)</span></div>
+                    <div className="flex justify-between"><span className="text-ink-400">Improvement vs raw DEM</span><span className="text-white font-mono">{modelInfo.improvement_vs_raw_pct}%</span></div>
+                    <div className="flex justify-between"><span className="text-ink-400">Training points / features</span><span className="text-white font-mono">{modelInfo.training_rows.toLocaleString()} / {modelInfo.n_features}</span></div>
+                  </>
+                )}
                 <div className="flex justify-between"><span className="text-ink-400">Ground Truth</span><span className="text-white">ICESat-2</span></div>
                 <div className="flex justify-between"><span className="text-ink-400">Primary DEM</span><span className="text-white">CartoDEM</span></div>
                 <div className="flex justify-between items-center pt-2 border-t border-ink-700/40">

@@ -6,7 +6,7 @@ import { askQuestion } from "../lib/askApi";
 import { playTingSound } from "../lib/notificationSound";
 
 const MAX_QUESTIONS = 5;
-const RESET_MS = 5 * 60 * 1000; // 5 minutes
+const RESET_MS = 7 * 60 * 1000; // 7 minutes
 const STORAGE_KEY = "askYourData_session";
 
 function loadSession() {
