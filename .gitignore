@@ -1,0 +1,19 @@
+# data & rasters (too big, not for git)
+data/
+*.parquet
+*.tif
+*.tiff
+*.zip
+*.csv
+# secrets
+.env
+.env.*
+*.key
+# python / node
+__pycache__/
+.venv/
+node_modules/
+client/dist/
+catboost_info/
+logs/
+.ipynb_checkpoints/

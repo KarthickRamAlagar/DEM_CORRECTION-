@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: #08090b;
+  color: #e7e9ee;
+  font-family: "Space Grotesk", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #242933;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #333a47;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes dash-flow {
+  to {
+    stroke-dashoffset: -200;
+  }
+}
+
+.orbit-path {
+  stroke-dasharray: 2 6;
+  animation: dash-flow 12s linear infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+.pulse-ring {
+  animation: pulse-ring 2.4s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
+}
+
+/* EDA Spatial Map tooltip - overrides Leaflet's default plain white
+   tooltip box to match the app's dark glass-panel style used
+   everywhere else (e.g. the Spatial Inspector panel). Leaflet's
+   default tooltip has hardcoded white background/border/arrow colors
+   that clash badly with a dark theme - this replaces all of them. */
+.eda-tooltip.leaflet-tooltip {
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(94, 234, 212, 0.3);
+  border-radius: 8px;
+  color: #e2e8f0;
+  font-size: 12px;
+  font-family: ui-monospace, monospace;
+  padding: 8px 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* Leaflet draws a little triangular "arrow" pointing from the tooltip
+   to the map location - it's a separate pseudo-element with its own
+   hardcoded white color that needs overriding too, or you get a white
+   arrow stuck on a dark tooltip box */
+.eda-tooltip.leaflet-tooltip-top::before {
+  border-top-color: rgba(94, 234, 212, 0.3);
+}
+.eda-tooltip.leaflet-tooltip-bottom::before {
+  border-bottom-color: rgba(94, 234, 212, 0.3);
+}
+.eda-tooltip.leaflet-tooltip-left::before {
+  border-left-color: rgba(94, 234, 212, 0.3);
+}
+.eda-tooltip.leaflet-tooltip-right::before {
+  border-right-color: rgba(94, 234, 212, 0.3);
+}
+
+/* Leaflet's default zoom controls (+/-) and attribution text also use
+   hardcoded white/light styling - same category of issue as the
+   tooltip fix above. Restyled to match the dark glass theme so every
+   piece of the map's UI chrome is visually consistent, not just the
+   tooltip. */
+.leaflet-control-zoom {
+  border: 1px solid rgba(94, 234, 212, 0.25) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+}
+.leaflet-control-zoom a {
+  background: rgba(15, 23, 42, 0.85) !important;
+  backdrop-filter: blur(8px);
+  color: #e2e8f0 !important;
+  border-color: rgba(94, 234, 212, 0.2) !important;
+}
+.leaflet-control-zoom a:hover {
+  background: rgba(30, 41, 59, 0.95) !important;
+  color: #5eead4 !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(15, 23, 42, 0.7) !important;
+  backdrop-filter: blur(6px);
+  color: #94a3b8 !important;
+  border-radius: 6px 0 0 0;
+}
+.leaflet-control-attribution a {
+  color: #5eead4 !important;
+}

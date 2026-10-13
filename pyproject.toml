@@ -1,0 +1,45 @@
+[project]
+name = "dem-correction"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "KarthickRamAlagar", email = "karthickramalagar@gmail.com" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "earthaccess>=0.14.0",
+    "geopandas>=1.1.4",
+    "h5py>=3.16.0",
+    "numpy>=2.2.6",
+    "osmnx>=2.0.7",
+    "pandas>=2.3.3",
+    "planetary-computer>=1.0.0",
+    "pyarrow>=25.0.1",
+    "pysolar>=0.13",
+    "pystac-client>=0.9.0",
+    "python-dotenv>=1.2.2",
+    "rasterio>=1.4.4",
+    "requests>=2.34.2",
+    "scipy>=1.15.3",
+    "sentinelhub>=3.11.5",
+    "fastapi>=0.115.0",
+    "uvicorn>=0.32.0",
+    "httpx>=0.27.0",
+    "duckdb>=1.1.0",
+    "python-dotenv>=1.0.0",
+    "cloudinary>=1.41.0",
+    "matplotlib>=3.9.0",
+    "pykrige>=1.7.0",
+    "lightgbm>=4.5.0",
+    "scikit-learn>=1.5.0",
+    "catboost>=1.2.0",
+    "joblib>=1.4.0",
+]
+
+[project.scripts]
+dem-correction = "dem_correction:main"
+
+[build-system]
+requires = ["uv_build>=0.12.3,<0.13.0"]
+build-backend = "uv_build"

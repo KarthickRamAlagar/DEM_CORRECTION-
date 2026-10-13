@@ -1,0 +1,106 @@
+{
+  "value_column": "elevation_error_signed",
+  "points": [
+    {
+      "distance_km": 11.55,
+      "semivariance": 5.1329,
+      "n_pairs": 37034
+    },
+    {
+      "distance_km": 28.03,
+      "semivariance": 6.2936,
+      "n_pairs": 89083
+    },
+    {
+      "distance_km": 45.91,
+      "semivariance": 7.0755,
+      "n_pairs": 134264
+    },
+    {
+      "distance_km": 63.86,
+      "semivariance": 7.0454,
+      "n_pairs": 183543
+    },
+    {
+      "distance_km": 81.98,
+      "semivariance": 7.049,
+      "n_pairs": 223056
+    },
+    {
+      "distance_km": 99.94,
+      "semivariance": 7.9027,
+      "n_pairs": 248416
+    },
+    {
+      "distance_km": 118.1,
+      "semivariance": 7.8938,
+      "n_pairs": 273965
+    },
+    {
+      "distance_km": 136.24,
+      "semivariance": 8.0908,
+      "n_pairs": 289677
+    },
+    {
+      "distance_km": 154.31,
+      "semivariance": 8.6381,
+      "n_pairs": 301054
+    },
+    {
+      "distance_km": 172.44,
+      "semivariance": 8.3375,
+      "n_pairs": 306548
+    },
+    {
+      "distance_km": 190.53,
+      "semivariance": 8.9753,
+      "n_pairs": 300421
+    },
+    {
+      "distance_km": 208.64,
+      "semivariance": 9.6302,
+      "n_pairs": 290681
+    },
+    {
+      "distance_km": 226.86,
+      "semivariance": 10.4463,
+      "n_pairs": 283229
+    },
+    {
+      "distance_km": 244.92,
+      "semivariance": 10.8363,
+      "n_pairs": 268380
+    },
+    {
+      "distance_km": 263.04,
+      "semivariance": 11.6465,
+      "n_pairs": 248758
+    },
+    {
+      "distance_km": 281.17,
+      "semivariance": 12.9196,
+      "n_pairs": 220729
+    },
+    {
+      "distance_km": 299.23,
+      "semivariance": 15.6016,
+      "n_pairs": 190286
+    },
+    {
+      "distance_km": 317.32,
+      "semivariance": 15.8444,
+      "n_pairs": 159719
+    },
+    {
+      "distance_km": 335.49,
+      "semivariance": 15.2688,
+      "n_pairs": 125191
+    },
+    {
+      "distance_km": 353.53,
+      "semivariance": 15.4662,
+      "n_pairs": 99541
+    }
+  ],
+  "note": "Semivariance typically rises with distance, then flattens - the distance where it flattens (the 'range') suggests how far apart points need to be before they stop influencing each other, useful for choosing spatial cross-validation block size."
+}
