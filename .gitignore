@@ -1,19 +1,20 @@
-# data & rasters (too big, not for git)
 data/
-*.parquet
-*.tif
-*.tiff
-*.zip
-*.csv
-# secrets
-.env
-.env.*
-*.key
-# python / node
+cache/
+logs/
+catboost_info/
 __pycache__/
 .venv/
 node_modules/
 client/dist/
-catboost_info/
-logs/
 .ipynb_checkpoints/
+.env
+.env.*
+*.key
+*.zip
+*.tif
+*.tiff
+*.parquet
+*.csv
+# keep the model evidence (small files)
+!outputs/*.csv
+!outputs/*.json
