@@ -20,10 +20,13 @@ from datetime import datetime
 import pandas as pd
 from fastapi import APIRouter
 
+from .datasets_sdg import build_sdg_datasets
+
 router = APIRouter(prefix="/api/datasets", tags=["datasets"])
 
 GOLDEN_DATASET_PATH = Path(__file__).parent.parent / "data" / "final" / "golden_dataset.parquet"
 DATA_RAW_DIR = Path(__file__).parent.parent / "data" / "raw"
+DATA_EXTERNAL_DIR = Path(__file__).parent.parent / "data" / "external"
 
 _cache = {}
 
@@ -195,6 +198,11 @@ def _load_real_stats():
         "granules": [],
         "granuleCount": 240,  # 48 tiles x 5 years
     }
+
+    for _k in ("icesat2-atl08", "sentinel2-l2a", "copernicus-dem-glo30", "sentinel1-grd"):
+        _cache[_k].update({"country": "IND+NPL", "use": "model",
+                           "coverage": "Pilot box (80-84 E, 25-28 N); includes Nepal's southern strip"})
+    _cache.update(build_sdg_datasets(DATA_EXTERNAL_DIR))
 
     return _cache
 

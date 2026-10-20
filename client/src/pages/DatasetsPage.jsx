@@ -6,6 +6,20 @@ import { DATASET_TYPES } from "../data/datasets";
 import { fetchDatasets } from "../lib/datasetsApi";
 import DatasetCard from "../components/dataset/DatasetCard";
 import MetadataInspector from "../components/dataset/MetadataInspector";
+import { IndiaFlag, NepalFlag } from "../components/dataset/CountryFlags";
+
+// Tabs: the original model-input datasets stay on "Model data"; India and Nepal hold the SDG layers.
+const REGIONS = [
+  { id: "model", label: "Model data", short: "Model" },
+  { id: "IND", label: "India", short: "IND" },
+  { id: "NPL", label: "Nepal", short: "NPL" },
+];
+const COUNTRY_TYPES = ["Raster", "Vector", "Table", "Document"];
+
+function inRegion(d, region) {
+  if (region === "model") return (d.use ?? "model") === "model";
+  return (d.use ?? "model") === "sdg" && (d.country ?? "").includes(region);
+}
 
 const STATUS_FILTERS = [
   { id: "all", label: "All statuses" },
@@ -93,6 +107,15 @@ export default function DatasetsPage() {
   const [inspectorTab, setInspectorTab] = useState("Overview");
   const [inspectorCollapsed, setInspectorCollapsed] = useState(false);
   const [mobileInspectorOpen, setMobileInspectorOpen] = useState(false);
+  const [region, setRegion] = useState("model");
+  const changeRegion = (r) => {
+    setRegion(r);
+    setTypeFilter("all");
+    setStatusFilter("all");
+    setSelectedId(null);
+    setMobileInspectorOpen(false);
+    setQuery("");
+  };
 
   // Real datasets, fetched from the actual pipeline - replaces the
   // static mock array. datasets.js's DATASET_TYPES constant is kept
@@ -102,11 +125,13 @@ export default function DatasetsPage() {
     queryKey: ["datasets"],
     queryFn: fetchDatasets,
   });
-  const datasets = datasetsQuery.data ?? [];
+  const allDatasets = datasetsQuery.data ?? [];
+  const datasets = useMemo(() => allDatasets.filter((d) => inRegion(d, region)), [allDatasets, region]);
+  const typesForRegion = region === "model" ? DATASET_TYPES : COUNTRY_TYPES;
 
   const counts = useMemo(() => {
     const byType = { all: datasets.length };
-    DATASET_TYPES.forEach((t) => (byType[t] = datasets.filter((d) => d.type === t).length));
+    typesForRegion.forEach((t) => (byType[t] = datasets.filter((d) => d.type === t).length));
     const byStatus = { all: datasets.length };
     STATUS_FILTERS.slice(1).forEach((s) => (byStatus[s.id] = datasets.filter((d) => d.status === s.id).length));
     return { byType, byStatus };
@@ -173,6 +198,32 @@ export default function DatasetsPage() {
         </div>
       </div>
 
+      {/* region tabs: model data, India, Nepal */}
+      <div className="flex items-center gap-2 px-5 pt-3 overflow-x-auto shrink-0">
+        {REGIONS.map((r) => {
+          const n = allDatasets.filter((d) => inRegion(d, r.id)).length;
+          const active = region === r.id;
+          return (
+            <button
+              key={r.id}
+              onClick={() => changeRegion(r.id)}
+              aria-pressed={active}
+              className={`shrink-0 flex items-center gap-2 px-3.5 py-2 rounded-lg text-[13px] font-medium border transition-colors ${
+                active
+                  ? "bg-signal-teal/10 border-signal-teal/40 text-signal-teal"
+                  : "bg-ink-900/60 border-ink-700/70 text-ink-300 hover:text-white"
+              }`}
+            >
+              {r.id === "IND" && <IndiaFlag className="w-5 h-[14px] rounded-[2px] shrink-0" />}
+              {r.id === "NPL" && <NepalFlag className="h-[18px] w-[15px] shrink-0" />}
+              <span className="hidden sm:inline">{r.label}</span>
+              <span className="sm:hidden">{r.short}</span>
+              <span className="text-[11px] opacity-70">({n})</span>
+            </button>
+          );
+        })}
+      </div>
+
       {/* filter row */}
       <div className="flex items-center gap-2 px-5 py-3 border-b border-ink-700/60 overflow-x-auto shrink-0">
         <button
@@ -185,7 +236,7 @@ export default function DatasetsPage() {
         >
           All Datasets ({counts.byType.all})
         </button>
-        {DATASET_TYPES.map((t) => (
+        {typesForRegion.map((t) => (
           <button
             key={t}
             onClick={() => setTypeFilter(t)}
