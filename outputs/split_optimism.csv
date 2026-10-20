@@ -1,0 +1,5 @@
+protocol,n_test,raw_RMSE,corrected_RMSE,corrected_RMSE_sd,reduction_pct
+Spatial 4-fold CV (10 km blocks + 5 km buffer),962094,4.5397,2.9821,,34.311
+"Random 4-fold CV (same rows, same model, same train size)",962094,4.5397,2.792,,38.498
+"Assignment-style: 5,000 random rows, 80/20 random split, LightGBM (tuned), mean of 5 repeats",1000,5.3614,3.8099,1.1022,28.9397
+"Assignment-style: 5,000 random rows, 80/20 random split, RandomForest (150 trees), mean of 5 repeats",1000,5.3614,3.6871,1.0813,31.229
