@@ -20,10 +20,10 @@ def sha256(p, chunk=1 << 22):
     return h.hexdigest()
 
 RECORDS = [
-    (ROOT / "population" / "worldpop", "ind_ppp_2020_constrained.tif", {
-        "source": "WorldPop, Global 2000-2020 Constrained, 2020, India, 100 m, BSGM",
-        "url": "https://data.worldpop.org/GIS/Population/Global_2000_2020_Constrained/2020/BSGM/IND/ind_ppp_2020_constrained.tif",
-        "version": "2020 constrained (modelled people per cell)", "licence": "CC BY 4.0",
+    (ROOT / "population" / "worldpop", "ind_pop_2020_CN_100m_R2024B_v1.tif", {
+        "source": "WorldPop 2020 constrained (CN) 100 m, release R2024B v1, India and Nepal rasters (product taken from the file names)",
+        "url": "not recorded (files were downloaded by hand; original link not kept)",
+        "version": "R2024B v1, 2020, constrained", "licence": "CC BY 4.0 (WorldPop standard licence, not checked for this release)",
         "note": "Modelled estimate, not a census count."}),
     (ROOT / "landcover" / "worldcover", "ESA_WorldCover_10m_2021_v200_N24E081_Map.tif", {
         "source": "ESA WorldCover 2021 v200, 10 m, tile N24E081 (24-27 N, 81-84 E)",
@@ -48,10 +48,27 @@ for folder, name, info in RECORDS:
     (folder / "SOURCE.json").write_text(json.dumps(rec, indent=2), encoding="utf-8")
     print("wrote", folder / "SOURCE.json")
 
+# add any other .tif in these folders (Nepal WorldPop raster, second WorldCover tile) to the record
+for folder, name, info in RECORDS:
+    sj = folder / "SOURCE.json"
+    if sj.exists():
+        rec = json.loads(sj.read_text(encoding="utf-8"))
+        if isinstance(rec, dict):
+            known = {x["name"] for x in rec.get("files", [])}
+            for extra in sorted(folder.glob("*.tif")):
+                if extra.name not in known:
+                    rec["files"].append({"name": extra.name, "bytes": extra.stat().st_size, "sha256": sha256(extra)})
+            sj.write_text(json.dumps(rec, indent=2), encoding="utf-8")
+            print("updated file list in", sj)
+
 # manifest
 items = []
 for sj in sorted(ROOT.rglob("SOURCE.json")):
     d = json.loads(sj.read_text(encoding="utf-8"))
+    if isinstance(d, list):
+        d = {"source": "; ".join(sorted({str(e.get("title") or e.get("note") or e.get("file")) for e in d})),
+             "licence": "; ".join(sorted({str(e.get("licence")) for e in d})),
+             "downloaded_on": max((str(e.get("downloaded") or "") for e in d), default=None)}
     folder = sj.parent
     nfiles = sum(1 for p in folder.rglob("*") if p.is_file() and p.name != "SOURCE.json")
     size = sum(p.stat().st_size for p in folder.rglob("*") if p.is_file())
