@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { MotionConfig } from "framer-motion";
 import { LayoutDashboard, Database, Radar, BarChart3, Sparkles, MessageCircleQuestion, Layers,TextCursorInput,Settings } from "lucide-react";
 import IconRail from "./components/IconRail";
 import SatellitePanel from "./components/SatellitePanel";
 import MapPane from "./components/MapPane";
 import DatasetsPage from "./pages/DatasetsPage";
 import SpatialExplorerPage from "./pages/SpatialExplorerPage";
-import AnalyticsPage from "./pages/AnalyticsPage";
 import EDAPage from "./pages/EDAPage";
 import AskYourDataPage from "./pages/AskYourDataPage";
 import { navItems } from "./data/mockData";
@@ -17,22 +17,32 @@ import ElevationCorrectionPage from "./pages/ElevationCorrectionPage";
 import NewInputsPage from "./pages/NewInputsPage.jsx";
 import ApplicationTour from "./components/ApplicationTour";
 import SettingsPage from "./pages/SettingsPage";
+import EvaluationMetricsPage from "./pages/EvaluationMetricsPage";
+import { getSettings } from "./lib/settingsStore";
+import { useSettings } from "./lib/useSettings";
 
 const MOBILE_ICONS = {
   dashboard: LayoutDashboard,
   datasets: Database,
   spatial: Radar,
-  analytics: BarChart3,
   eda: Sparkles,
   ask: MessageCircleQuestion,
   "elevation-correction": Layers,
   "new-inputs": TextCursorInput,
+  evaluation: BarChart3,
    settings: Settings, 
 };
 
 export default function App() {
   const [active, setActive] = useState("dashboard");
-  const [collapsed, setCollapsed] = useState(false);
+  const settings = useSettings();
+  const [collapsed, setCollapsed] = useState(() => getSettings().sidebarCollapsedDefault);
+
+  // Settings > Appearance > "Start with sidebar collapsed": applies on
+  // startup AND immediately when the switch is changed
+  useEffect(() => {
+    setCollapsed(settings.sidebarCollapsedDefault);
+  }, [settings.sidebarCollapsedDefault]);
   const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(DEFAULT_SATELLITE_ID);
 
@@ -46,6 +56,7 @@ export default function App() {
   };
 
   return (
+    <MotionConfig reducedMotion={settings.animationsEnabled ? "user" : "always"}>
     <div className="h-screen w-screen flex bg-ink-950 text-ink-100 overflow-hidden">
       <IconRail
         active={active}
@@ -96,12 +107,6 @@ export default function App() {
         </div>
       )}
 
-      {active === "analytics" && (
-        <div className="flex-1 min-w-0 h-full pb-14 lg:pb-0">
-          <AnalyticsPage />
-        </div>
-      )}
-
       {active === "eda" && (
         <div className="flex-1 min-w-0 h-full pb-14 lg:pb-0">
           <EDAPage />
@@ -125,7 +130,13 @@ export default function App() {
             <NewInputsPage />
           </div>
         )}
-        {active === "settings" && <SettingsPage />}
+        {active === "evaluation" && <div className="flex-1 min-w-0 h-full pb-14 lg:pb-0"><EvaluationMetricsPage /></div>}
+
+        {active === "settings" && (
+          <div className="flex-1 min-w-0 h-full pb-14 lg:pb-0">
+            <SettingsPage />
+          </div>
+        )}
 
       
 
@@ -149,5 +160,6 @@ export default function App() {
         })}
       </nav>
     </div>
+    </MotionConfig>
   );
 }

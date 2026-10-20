@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Globe from "react-globe.gl";
+import { useSettings } from "../lib/useSettings";
 
 // LEO altitudes (400-900km) are a tiny fraction of Earth's radius (6371km),
 // so a true-to-scale point sits almost flush with the surface. We exaggerate
@@ -14,6 +15,9 @@ export default function Globe3D({ satellites, selectedId, onSelect }) {
   const wrapRef = useRef(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
   const [userInteracted, setUserInteracted] = useState(false);
+  const { animationsEnabled } = useSettings();
+  // Settings > Appearance > Animations also controls the globe's idle spin
+  const getAutoRotate = () => animationsEnabled && !userInteracted;
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -32,12 +36,17 @@ export default function Globe3D({ satellites, selectedId, onSelect }) {
     g.pointOfView({ lat: 15, lng: 40, altitude: 2.3 }, 0);
     const controls = g.controls();
     if (controls) {
-      controls.autoRotate = true;
+      controls.autoRotate = getAutoRotate();
       controls.autoRotateSpeed = 0.35;
       controls.enableDamping = true;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [size.w > 0]);
+
+  useEffect(() => {
+    const controls = globeRef.current?.controls?.();
+    if (controls) controls.autoRotate = animationsEnabled && !userInteracted;
+  }, [animationsEnabled, userInteracted]);
 
   const stopAutoRotate = () => {
     const controls = globeRef.current?.controls?.();
@@ -80,7 +89,7 @@ export default function Globe3D({ satellites, selectedId, onSelect }) {
   return (
     <div
       ref={wrapRef}
-      className="absolute inset-0 isolate"
+      className="absolute inset-0 isolate globe-space"
       onPointerDown={stopAutoRotate}
       onWheel={stopAutoRotate}
     >

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { getSettings } from "../lib/settingsStore";
 
 const TOUR_SEEN_KEY = "hasSeenApplicationTour";
 
@@ -8,7 +9,6 @@ const TOUR_STEPS = [
   { pageId: "dashboard", title: "Dashboard", text: "Live satellite tracking - real orbital positions and telemetry for the mission satellites.", audio: "/mp3/tour-dashboard.mp3" },
   { pageId: "datasets", title: "Datasets", text: "Every real dataset used in this project - Sentinel imagery, CartoDEM, and ICESat-2 ground truth.", audio: "/mp3/tour-datasets.mp3" },
   { pageId: "spatial", title: "Spatial Explorer", text: "Explore the study region spatially - coverage, terrain patterns, and geographic context.", audio: "/mp3/tour-spatial.mp3" },
-  { pageId: "analytics", title: "Analytics", text: "Model performance analytics - real comparisons across every baseline method tested.", audio: "/mp3/tour-analytics.mp3" },
   { pageId: "eda", title: "EDA", text: "Exploratory analysis on 55 real features - correlations and spatial patterns from 1.2 million points.", audio: "/mp3/tour-eda.mp3" },
   { pageId: "ask", title: "Ask Your Data", text: "Ask questions in plain English or by voice - real, validated answers from the trained model.", audio: "/mp3/tour-ask.mp3" },
   { pageId: "elevation-correction", title: "Elevation Correction", text: "See the actual DEM correction in action - old versus new elevation, point by point.", audio: "/mp3/tour-elevation.mp3" },
@@ -38,9 +38,11 @@ const TOOLTIP_POSITIONS = [
 function playAudioAndAdvance(src, audioRef, onAdvance, durationMs) {
   try {
     if (audioRef.current) audioRef.current.pause();
-    const audio = new Audio(src);
-    audioRef.current = audio;
-    audio.play().catch(() => {}); // audio is best-effort, never blocks timing
+    if (getSettings().tourAudioEnabled) { // Settings > Voice & Assistant > Tour narration
+      const audio = new Audio(src);
+      audioRef.current = audio;
+      audio.play().catch(() => {}); // audio is best-effort, never blocks timing
+    }
   } catch {
     // no-op - audio is optional
   }
@@ -66,6 +68,20 @@ export default function ApplicationTour({ active, setActive }) {
     }
   }, []);
 
+  // Settings > Data & Privacy > "Restart guided tour" sends this event
+  useEffect(() => {
+    const restart = () => {
+      try { localStorage.removeItem(TOUR_SEEN_KEY); } catch { /* ignore */ }
+      clearTimeout(advanceTimerRef.current);
+      if (audioRef.current) audioRef.current.pause();
+      setStepIndex(0);
+      setPhase("intro");
+      setTimeout(() => setVisible(true), 100);
+    };
+    window.addEventListener("demCorrectionRestartTour", restart);
+    return () => window.removeEventListener("demCorrectionRestartTour", restart);
+  }, []);
+
   // FIX (real conflict reported): other pages (like New Inputs) have
   // their own first-visit speech/tooltip logic that was firing AT THE
   // SAME TIME the tour narrates that same page, causing overlapping
@@ -77,7 +93,7 @@ export default function ApplicationTour({ active, setActive }) {
   }, [phase]);
 
   useEffect(() => {
-    if (phase === "intro") {
+    if (phase === "intro" && getSettings().tourAudioEnabled) {
       const audio = new Audio("/mp3/tour-intro.mp3");
       audioRef.current = audio;
       audio.play().catch(() => {});

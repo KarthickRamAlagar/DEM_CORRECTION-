@@ -68,7 +68,7 @@ export default function MapView({ satellites, selectedId, onSelect }) {
   );
 
   return (
-    <div className="relative isolate w-full h-full bg-ink-950 overflow-hidden">
+    <div className="relative isolate w-full h-full bg-ink-950 map-ocean overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-6 flex items-center px-6 justify-between text-[10px] font-mono text-ink-500 pointer-events-none z-10">
         <span>90°N</span>
         <span>0°</span>
@@ -93,8 +93,8 @@ export default function MapView({ satellites, selectedId, onSelect }) {
         height={520}
         style={{ width: "100%", height: "100%" }}
       >
-        <Sphere id="sphere" fill="transparent" stroke="#1b1f27" strokeWidth={0.5} />
-        <Graticule stroke="#161a21" strokeWidth={0.5} />
+        <Sphere id="sphere" className="map-sphere" fill="transparent" stroke="#1b1f27" strokeWidth={0.5} />
+        <Graticule className="map-graticule" stroke="#161a21" strokeWidth={0.5} />
 
         <Geographies geography={GEO_URL}>
           {({ geographies }) =>
@@ -102,12 +102,13 @@ export default function MapView({ satellites, selectedId, onSelect }) {
               <Geography
                 key={geo.rsmKey}
                 geography={geo}
+                className="map-land"
                 fill="#12151b"
                 stroke="#242933"
                 strokeWidth={0.6}
                 style={{
                   default: { outline: "none" },
-                  hover: { outline: "none", fill: "#171b22" },
+                  hover: { outline: "none", fill: "rgb(var(--map-land-hover))" },
                   pressed: { outline: "none" },
                 }}
               />

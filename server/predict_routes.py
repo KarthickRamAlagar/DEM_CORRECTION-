@@ -64,6 +64,20 @@ class AreaPredictRequest(BaseModel):
     year: int = DEFAULT_YEAR
 
 
+# --- year fix: available feature years ---
+@router.get("/available-years")
+def get_available_feature_years():
+    """Years that have a features_<year>.tif on disk (the map-click prediction needs one)."""
+    folder = DATA_INTERIM / "features"
+    years = []
+    if folder.exists():
+        for f in folder.glob("features_*.tif"):
+            tail = f.stem.split("_")[-1]
+            if tail.isdigit():
+                years.append(int(tail))
+    return {"available_years": sorted(years), "default_year": DEFAULT_YEAR}
+
+
 @router.get("/technical/defaults")
 def get_technical_defaults():
     artifact = _load_artifact()

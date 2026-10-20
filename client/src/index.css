@@ -2,6 +2,70 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ---- Colour tokens (Tailwind's ink-* / signal-* read these) ----------
+   Dark values are identical to the original hex colours. The light
+   theme (Settings > Appearance) swaps them under data-theme="light". */
+:root {
+  --ink-950: 8 9 11;
+  --ink-900: 12 14 18;
+  --ink-850: 16 19 24;
+  --ink-800: 20 23 29;
+  --ink-700: 27 31 39;
+  --ink-600: 36 41 51;
+  --ink-500: 51 58 71;
+  --ink-400: 76 85 102;
+  --ink-300: 107 118 136;
+  --ink-200: 152 162 179;
+  --ink-100: 199 204 214;
+  --signal-teal: 94 234 212;
+  --signal-gold: 217 196 138;
+  --signal-amber: 240 180 41;
+  --signal-red: 242 84 91;
+  --signal-green: 74 222 128;
+  --signal-violet: 167 139 250;
+  --signal-sky: 96 165 250;
+  --signal-lime: 163 230 53;
+  --signal-coral: 251 113 133;
+  --body-text: 231 233 238;
+  --map-land: 18 21 27;
+  --map-land-stroke: 36 41 51;
+  --map-land-hover: 23 27 34;
+  --map-sphere: 27 31 39;
+  --map-grid: 22 26 33;
+  --scroll-thumb: 36 41 51;
+  --scroll-thumb-hover: 51 58 71;
+}
+html[data-theme="light"] {
+  --ink-950: 244 246 249;
+  --ink-900: 255 255 255;
+  --ink-850: 248 249 251;
+  --ink-800: 238 241 245;
+  --ink-700: 221 226 234;
+  --ink-600: 205 212 222;
+  --ink-500: 170 179 194;
+  --ink-400: 107 118 136;
+  --ink-300: 85 96 114;
+  --ink-200: 60 70 87;
+  --ink-100: 35 42 54;
+  --signal-teal: 15 118 110;
+  --signal-gold: 133 100 20;
+  --signal-amber: 161 98 7;
+  --signal-red: 185 28 28;
+  --signal-green: 21 128 61;
+  --signal-violet: 109 40 217;
+  --signal-sky: 29 78 216;
+  --signal-lime: 77 124 15;
+  --signal-coral: 190 18 60;
+  --body-text: 35 42 54;
+  --map-land: 71 85 105;
+  --map-land-stroke: 148 163 184;
+  --map-land-hover: 100 116 139;
+  --map-sphere: 100 116 139;
+  --map-grid: 255 255 255;
+  --scroll-thumb: 205 212 222;
+  --scroll-thumb-hover: 170 179 194;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -14,8 +78,8 @@ body,
 }
 
 body {
-  background: #08090b;
-  color: #e7e9ee;
+  background: rgb(var(--ink-950));
+  color: rgb(var(--body-text));
   font-family: "Space Grotesk", sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -28,11 +92,11 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #242933;
+  background: rgb(var(--scroll-thumb));
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #333a47;
+  background: rgb(var(--scroll-thumb-hover));
 }
 
 .tabular {
@@ -129,3 +193,216 @@ body {
 .leaflet-control-attribution a {
   color: #5eead4 !important;
 }
+
+/* ======================================================================
+   Settings > Appearance
+   ====================================================================== */
+
+/* Compact interface: Tailwind spacing is in rem, so a smaller root font
+   size tightens padding, gaps and card spacing everywhere. Text sized in
+   px (text-[12px] etc.) keeps its size. */
+html.compact {
+  font-size: 14px;
+}
+
+/* Animations off: every CSS animation / transition finishes instantly. */
+html.no-anim *,
+html.no-anim *::before,
+html.no-anim *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  transition-delay: 0s !important;
+  scroll-behavior: auto !important;
+}
+/* loading spinners keep turning - they signal that work is in progress */
+html.no-anim .animate-spin {
+  animation-duration: 1s !important;
+  animation-iteration-count: infinite !important;
+}
+html.no-anim .pulse-ring {
+  animation: none !important;
+  opacity: 0;
+}
+
+/* Light theme: pages write text-white for "main text on a dark panel".
+   On light panels that must become dark text - except on coloured
+   buttons/badges (bg-signal-*, gradients), where white stays correct. */
+html[data-theme="light"] .text-white:not([class*="bg-signal"]):not([class*="bg-gradient"]):not([class*="bg-red"]) {
+  color: rgb(var(--ink-100));
+}
+html[data-theme="light"] .hover\:text-white:hover,
+html[data-theme="light"] .group:hover .group-hover\:text-white {
+  color: rgb(var(--ink-100));
+}
+html[data-theme="light"] .shadow-panel {
+  box-shadow: 0 12px 40px -16px rgba(15, 23, 42, 0.18);
+}
+
+/* White speech bubbles (guided tour, New Inputs helper) are white in
+   both themes, so inside them keep the dark-theme colour tokens. */
+html[data-theme="light"] .bg-white.text-ink-950 {
+  --ink-950: 8 9 11;
+  --ink-900: 12 14 18;
+  --ink-850: 16 19 24;
+  --ink-800: 20 23 29;
+  --ink-700: 27 31 39;
+  --ink-600: 36 41 51;
+  --ink-500: 51 58 71;
+  --ink-400: 76 85 102;
+  --ink-300: 107 118 136;
+  --ink-200: 152 162 179;
+  --ink-100: 199 204 214;
+  --signal-teal: 94 234 212;
+  --signal-gold: 217 196 138;
+  --signal-amber: 240 180 41;
+  --signal-red: 242 84 91;
+  --signal-green: 74 222 128;
+  --signal-violet: 167 139 250;
+  --signal-sky: 96 165 250;
+  --signal-lime: 163 230 53;
+  --signal-coral: 251 113 133;
+  color: #08090b;
+}
+
+
+/* ======================================================================
+   Light theme - maps, charts and coloured text
+   ====================================================================== */
+
+/* 2D world map (Dashboard): land and grid read from variables so the
+   map follows the theme. Light: pale-blue sea with a vertical gradient,
+   slate land, white grid. */
+.map-land {
+  fill: rgb(var(--map-land));
+  stroke: rgb(var(--map-land-stroke));
+}
+.map-sphere {
+  stroke: rgb(var(--map-sphere));
+}
+.map-graticule {
+  stroke: rgb(var(--map-grid));
+}
+html[data-theme="light"] .map-graticule {
+  stroke-opacity: 0.35;
+}
+html[data-theme="light"] .map-ocean {
+  background: linear-gradient(180deg, #eaf4ff 0%, #d4e8fb 55%, #bcd9f5 100%);
+}
+/* satellite ground tracks get a thin white halo so they read over both
+   the pale sea and the dark land */
+html[data-theme="light"] .orbit-path {
+  filter: drop-shadow(0 0 1.2px rgba(255, 255, 255, 0.95));
+  stroke-width: 1.9px;
+  stroke-dasharray: 4 4;
+}
+/* 3D globe: light theme shows it against a deep-space gradient so the
+   dark globe, atmosphere and orbit lines stay clearly visible */
+html[data-theme="light"] .globe-space {
+  background: radial-gradient(ellipse at 50% 45%, #1f3a5c 0%, #0f1c33 55%, #070d1a 100%);
+}
+
+/* Intentionally dark overlays keep the dark colour tokens, so their
+   text (text-white, text-ink-*) stays readable in light theme too. */
+html[data-theme="light"] .eda-tooltip.leaflet-tooltip {
+  --ink-950: 8 9 11;
+  --ink-900: 12 14 18;
+  --ink-850: 16 19 24;
+  --ink-800: 20 23 29;
+  --ink-700: 27 31 39;
+  --ink-600: 36 41 51;
+  --ink-500: 51 58 71;
+  --ink-400: 76 85 102;
+  --ink-300: 107 118 136;
+  --ink-200: 152 162 179;
+  --ink-100: 199 204 214;
+  --signal-teal: 94 234 212;
+  --signal-gold: 217 196 138;
+  --signal-amber: 240 180 41;
+  --signal-red: 242 84 91;
+  --signal-green: 74 222 128;
+  --signal-violet: 167 139 250;
+  --signal-sky: 96 165 250;
+  --signal-lime: 163 230 53;
+  --signal-coral: 251 113 133;
+  color: #e2e8f0;
+}
+
+/* SVG charts: pale colours designed for dark panels are swapped for
+   readable ones on light panels. Leaflet's own overlay SVG (dark maps)
+   is excluded so map layers keep their colours. */
+html[data-theme="light"] svg:not(.leaflet-zoom-animated) text[fill="#f1f5f9"] { fill: rgb(var(--ink-100)); }
+html[data-theme="light"] svg:not(.leaflet-zoom-animated) text[fill="#cbd5e1"] { fill: rgb(var(--ink-200)); }
+html[data-theme="light"] svg:not(.leaflet-zoom-animated) text[fill="#94a3b8"] { fill: rgb(var(--ink-300)); }
+html[data-theme="light"] svg:not(.leaflet-zoom-animated) [stroke="#e7e9ee"] { stroke: rgb(var(--ink-200)); }
+html[data-theme="light"] svg:not(.leaflet-zoom-animated) [stroke="#8a93a3"] { stroke: rgb(var(--ink-300)); }
+
+html[data-theme="light"] svg:not(.leaflet-zoom-animated) [fill="#5eead4"] { fill: rgb(13 148 136); }
+html[data-theme="light"] svg:not(.leaflet-zoom-animated) [stroke="#5eead4"] { stroke: rgb(13 148 136); }
+html[data-theme="light"] svg:not(.leaflet-zoom-animated) [fill="#60a5fa"] { fill: rgb(37 99 235); }
+html[data-theme="light"] svg:not(.leaflet-zoom-animated) [stroke="#60a5fa"] { stroke: rgb(37 99 235); }
+html[data-theme="light"] svg:not(.leaflet-zoom-animated) [fill="#a78bfa"] { fill: rgb(124 58 237); }
+html[data-theme="light"] svg:not(.leaflet-zoom-animated) [stroke="#a78bfa"] { stroke: rgb(124 58 237); }
+html[data-theme="light"] svg:not(.leaflet-zoom-animated) [fill="#d9c48a"] { fill: rgb(161 120 20); }
+html[data-theme="light"] svg:not(.leaflet-zoom-animated) [stroke="#d9c48a"] { stroke: rgb(161 120 20); }
+html[data-theme="light"] svg:not(.leaflet-zoom-animated) [fill="#a3e635"] { fill: rgb(77 124 15); }
+html[data-theme="light"] svg:not(.leaflet-zoom-animated) [stroke="#a3e635"] { stroke: rgb(77 124 15); }
+html[data-theme="light"] svg:not(.leaflet-zoom-animated) [fill="#fb7185"] { fill: rgb(225 29 72); }
+html[data-theme="light"] svg:not(.leaflet-zoom-animated) [stroke="#fb7185"] { stroke: rgb(225 29 72); }
+html[data-theme="light"] svg:not(.leaflet-zoom-animated) [fill="#fbbf24"] { fill: rgb(217 119 6); }
+html[data-theme="light"] svg:not(.leaflet-zoom-animated) [fill="#4ade80"] { fill: rgb(22 163 74); }
+html[data-theme="light"] svg:not(.leaflet-zoom-animated) [fill="#f2545b"] { fill: rgb(220 38 38); }
+
+/* Text set with an inline pale colour (satellite names, layer labels,
+   location lines) gets the same darker equivalents on light panels. */
+html[data-theme="light"] [style*="color: rgb(94, 234, 212)"] { color: rgb(13 148 136) !important; }
+html[data-theme="light"] [style*="color: rgb(96, 165, 250)"] { color: rgb(37 99 235) !important; }
+html[data-theme="light"] [style*="color: rgb(167, 139, 250)"] { color: rgb(124 58 237) !important; }
+html[data-theme="light"] [style*="color: rgb(217, 196, 138)"] { color: rgb(161 120 20) !important; }
+html[data-theme="light"] [style*="color: rgb(163, 230, 53)"] { color: rgb(77 124 15) !important; }
+html[data-theme="light"] [style*="color: rgb(251, 113, 133)"] { color: rgb(225 29 72) !important; }
+html[data-theme="light"] [style*="color: rgb(74, 222, 128)"] { color: rgb(22 163 74) !important; }
+html[data-theme="light"] [style*="color: rgb(250, 204, 21)"] { color: rgb(161 98 7) !important; }
+html[data-theme="light"] [style*="color: rgb(251, 146, 60)"] { color: rgb(194 65 12) !important; }
+html[data-theme="light"] [style*="color: rgb(152, 162, 179)"] { color: rgb(var(--ink-300)) !important; }
+html[data-theme="light"] [style*="color: rgb(242, 84, 91)"] { color: rgb(220 38 38) !important; }
+html[data-theme="light"] [style*="color: rgb(251, 191, 36)"] { color: rgb(180 83 9) !important; }
+html[data-theme="light"] [style*="color: rgb(240, 180, 41)"] { color: rgb(180 120 0) !important; }
+
+/* Light theme: the faintest text greys were tuned for dark panels and
+   fall below readable contrast on white - lift them to the secondary tone. */
+html[data-theme="light"] .text-ink-500,
+html[data-theme="light"] .text-ink-600,
+html[data-theme="light"] .text-ink-700 {
+  color: rgb(var(--ink-400));
+}
+
+/* ------------------------------------------------------------------
+   Evaluation page: own typography + a calmer blue / amber data palette.
+   Everything is scoped to .eval-page so no other page changes.
+   ------------------------------------------------------------------ */
+.eval-page {
+  --ev-sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --ev-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --ev-spatial: 96 165 250;   /* blue  - spatial split / accent */
+  --ev-random: 224 166 62;    /* amber - random split */
+  /* the page accent replaces the app teal, so existing signal-teal classes follow it */
+  --signal-teal: 96 165 250;
+  font-family: var(--ev-sans);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+html[data-theme="light"] .eval-page {
+  --ev-spatial: 37 99 235;
+  --ev-random: 180 112 12;
+  --signal-teal: 37 99 235;
+}
+.eval-page, .eval-page button, .eval-page input, .eval-page table,
+.eval-page .font-display, .eval-page .font-mono, .eval-page svg text {
+  font-family: var(--ev-sans) !important;
+}
+.eval-page .ev-serif, .eval-page h1, .eval-page h2 {
+  font-family: var(--ev-serif) !important;
+  letter-spacing: -0.005em;
+}
+.eval-page .uppercase { text-transform: none; }
+.eval-page [class*="tracking-"] { letter-spacing: 0; }

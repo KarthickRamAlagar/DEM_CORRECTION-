@@ -5,6 +5,10 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import App from "./App.jsx";
 import DeviceGate from "./components/DeviceGate.jsx";
 import "./index.css";
+import { initAppearance } from "./lib/applySettings";
+
+// apply saved theme / compact / animation settings before first paint
+initAppearance();
 
 // TanStack Query added for pages that talk to the real backend (starting
 // with the EDA page) - existing pages that don't use useQuery are

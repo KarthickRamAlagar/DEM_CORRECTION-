@@ -4,12 +4,15 @@ import { AlertTriangle, ExternalLink } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 import ImageryOverlayLayer, { imageryStatus, DARK_BASEMAP_URL, DARK_BASEMAP_ATTRIBUTION } from "./ImageryOverlayLayer";
 import { sentinelHubCapabilitiesUrl } from "../lib/imagery";
+import { getSettings } from "../lib/settingsStore";
 
 function RecenterOnSelect({ lat, lon }) {
   const map = useMap();
   useEffect(() => {
     if (lat != null && lon != null) {
-      map.flyTo([lat, lon], Math.max(map.getZoom(), 3), { duration: 0.8 });
+      const zoom = Math.max(map.getZoom(), 3);
+      if (getSettings().animationsEnabled) map.flyTo([lat, lon], zoom, { duration: 0.8 });
+      else map.setView([lat, lon], zoom, { animate: false }); // Animations off: jump, don't fly
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lat, lon]);

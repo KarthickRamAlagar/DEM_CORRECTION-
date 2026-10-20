@@ -16,11 +16,11 @@ const ICONS = {
   dashboard: LayoutDashboard,
   datasets: Database,
   spatial: Radar,
-  analytics: BarChart3,
   eda: Sparkles,
   ask: MessageCircleQuestion,
   "elevation-correction": Layers, 
   "new-inputs": TextCursorInput,
+  evaluation: BarChart3,
    "settings": Settings,
 };
 

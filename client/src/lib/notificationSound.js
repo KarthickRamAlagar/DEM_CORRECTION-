@@ -2,7 +2,10 @@
 // no external audio file to source/host, works reliably in any modern
 // browser, and needs zero network request.
 
+import { getSettings } from "./settingsStore";
+
 export function playTingSound() {
+  if (!getSettings().soundEffects) return; // Settings > Voice & Assistant > Sound effects
   try {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     const ctx = new AudioContext();

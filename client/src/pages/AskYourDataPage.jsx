@@ -4,6 +4,7 @@ import { Mic, Send, Volume2, VolumeX, RotateCcw, Database, AlertCircle, Sparkles
 import { suggestedQuestions, LANGUAGES } from "../data/mockAsk";
 import { askQuestion } from "../lib/askApi";
 import { playTingSound } from "../lib/notificationSound";
+import { speakText as speakWithSettings } from "../lib/speakText";
 
 const MAX_QUESTIONS = 5;
 const RESET_MS = 7 * 60 * 1000; // 7 minutes
@@ -176,14 +177,16 @@ export default function AskYourDataPage() {
     setSpeaking(false);
   }
 
+  // "Play answer" is a button the user pressed, so it always plays
+  // (force) - but speed, volume and voice follow Settings.
   function speakText(text) {
     if (!window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "en-IN";
-    utterance.onend = () => setSpeaking(false);
     setSpeaking(true);
-    window.speechSynthesis.speak(utterance);
+    const started = speakWithSettings(text, "en-IN", {
+      force: true,
+      onend: () => setSpeaking(false),
+    });
+    if (!started) setSpeaking(false);
   }
 
   // FIX (frontend safety net, alongside the real backend fix): if a

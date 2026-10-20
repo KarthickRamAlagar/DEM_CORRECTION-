@@ -9,8 +9,15 @@ export function useSettings() {
 
   useEffect(() => {
     const handler = (e) => setSettings(e.detail);
+    const onStorage = (e) => {
+      if (e.key === "demCorrectionSettings") setSettings(getSettings());
+    };
     window.addEventListener("demCorrectionSettingsChanged", handler);
-    return () => window.removeEventListener("demCorrectionSettingsChanged", handler);
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener("demCorrectionSettingsChanged", handler);
+      window.removeEventListener("storage", onStorage);
+    };
   }, []);
 
   return settings;
