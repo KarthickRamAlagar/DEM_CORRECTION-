@@ -20,7 +20,8 @@
     "react-globe.gl": "^2.31.0",
     "react-leaflet": "^4.2.1",
     "react-simple-maps": "^3.0.0",
-    "satellite.js": "^5.0.0"
+    "satellite.js": "^5.0.0",
+    "three": "^0.186.1"
   },
   "devDependencies": {
     "@tanstack/react-query-devtools": "^5.62.0",

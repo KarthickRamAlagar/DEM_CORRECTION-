@@ -1,3 +1,4 @@
+import SdgContinueButton from "../components/sdg/SdgContinueButton";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { MapContainer, TileLayer, Rectangle, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -1187,6 +1188,13 @@ function TechnicalMode() {
                   </button>
                 </div>
                 {pdfMessage && <p className="text-[12px] text-ink-500 mt-2 text-center">{pdfMessage}</p>}
+                <div className="mt-3">
+                  <SdgContinueButton lat={pickedLocation?.lat} lng={pickedLocation?.lng} corrected={values.raw_z + result.predicted_error} raw={values.raw_z}
+                    interval={result.interval_lower !== undefined ? [values.raw_z + result.interval_lower, values.raw_z + result.interval_upper] : null} date={dateValue}
+                    inputs={GROUP_NAMES.map((g) => ({ group: g, rows: FEATURE_GROUPS[g].map((f) => [FIELD_LABELS[f] || f, values[f] ?? null]) }))}
+                    engine={{ model: result.model_used, rmse: result.validated_rmse, reliable: result.is_reliable, version: result.model_version }}
+                    className="w-full rounded-lg border border-signal-teal/40 bg-signal-teal/10 px-3 py-2.5 text-sm font-medium text-signal-teal hover:bg-signal-teal/20" />
+                </div>
               </div>
             </div>
           </div>
@@ -1591,6 +1599,7 @@ function NormalMode() {
                 </div>
               )}
               <p className="text-[12px] text-ink-400 pt-3 border-t border-ink-700/60">{result.message}</p>
+<SdgContinueButton lat={clickedPoint.lat} lng={clickedPoint.lng} corrected={result.corrected_elevation} raw={result.raw_elevation} interval={result.corrected_interval ?? null} date={dateValue} />
             </div>
           ) : null}
         </div>

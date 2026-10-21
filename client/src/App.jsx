@@ -18,6 +18,8 @@ import NewInputsPage from "./pages/NewInputsPage.jsx";
 import ApplicationTour from "./components/ApplicationTour";
 import SettingsPage from "./pages/SettingsPage";
 import EvaluationMetricsPage from "./pages/EvaluationMetricsPage";
+import SdgPage from "./pages/SdgPage";
+import { Target } from "lucide-react";
 import { getSettings } from "./lib/settingsStore";
 import { useSettings } from "./lib/useSettings";
 
@@ -29,12 +31,12 @@ const MOBILE_ICONS = {
   ask: MessageCircleQuestion,
   "elevation-correction": Layers,
   "new-inputs": TextCursorInput,
-  evaluation: BarChart3,
+  evaluation: BarChart3, sdg: Target,
    settings: Settings, 
 };
 
 export default function App() {
-  const [active, setActive] = useState("dashboard");
+  const [active, setActive] = useState(() => { try { return sessionStorage.getItem("app_active") === "sdg" ? "sdg" : "dashboard"; } catch (e) { return "dashboard"; } });
   const settings = useSettings();
   const [collapsed, setCollapsed] = useState(() => getSettings().sidebarCollapsedDefault);
 
@@ -44,6 +46,8 @@ export default function App() {
     setCollapsed(settings.sidebarCollapsedDefault);
   }, [settings.sidebarCollapsedDefault]);
   const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
+useEffect(() => { const h = (e) => { if (e && e.detail) setActive(e.detail); }; window.addEventListener("app-navigate", h); return () => window.removeEventListener("app-navigate", h); }, []);
+  useEffect(() => { try { if (active === "sdg") sessionStorage.setItem("app_active", "sdg"); else sessionStorage.removeItem("app_active"); } catch (e) { /* storage blocked */ } }, [active]);
   const [selectedId, setSelectedId] = useState(DEFAULT_SATELLITE_ID);
 
   const tleEntries = useTleCatalog();
@@ -130,7 +134,7 @@ export default function App() {
             <NewInputsPage />
           </div>
         )}
-        {active === "evaluation" && <div className="flex-1 min-w-0 h-full pb-14 lg:pb-0"><EvaluationMetricsPage /></div>}
+        {active === "evaluation" && <div className="flex-1 min-w-0 h-full pb-14 lg:pb-0"><EvaluationMetricsPage /></div>} {active === "sdg" && <div className="flex-1 min-w-0 h-full pb-14 lg:pb-0"><SdgPage /></div>}
 
         {active === "settings" && (
           <div className="flex-1 min-w-0 h-full pb-14 lg:pb-0">

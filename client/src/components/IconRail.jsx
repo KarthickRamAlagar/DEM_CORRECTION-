@@ -11,6 +11,7 @@ import {
   TextCursorInput,
 } from "lucide-react";
 import { navItems } from "../data/mockData";
+import { Target } from "lucide-react";
 
 const ICONS = {
   dashboard: LayoutDashboard,
@@ -20,7 +21,7 @@ const ICONS = {
   ask: MessageCircleQuestion,
   "elevation-correction": Layers, 
   "new-inputs": TextCursorInput,
-  evaluation: BarChart3,
+  evaluation: BarChart3, sdg: Target,
    "settings": Settings,
 };
 

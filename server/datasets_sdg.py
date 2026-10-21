@@ -49,11 +49,11 @@ def build_sdg_datasets(ext):
         "ODbL", "Building footprints for the fetch area, one GeoParquet piece per grid cell. Footprints show buildings, not damage.",
         PILOT, "Version 2.0 (Sep 2024)", ["buildings", "exposure"], [{"name": "geometry", "type": "Polygon", "unit": "-"}], 100)
     d["buildings-npl"] = _entry("buildings-npl", "Open Buildings - Nepal", "VIDA Google + Microsoft footprints (real, fetched)", "Vector", "NPL",
-        "VIDA / Source Cooperative", "1,678,436 footprints (26 non-empty pieces)", _size_label(ext / "buildings" / "vida_npl"), "EPSG:4326", "Building footprint",
+        "VIDA / Source Cooperative", "12,023,785 rows in 435 files; 10,004,463 unique buildings inside the study region (1.68 million duplicates removed)", _size_label(ext / "buildings" / "vida_npl"), "EPSG:4326", "Building footprint",
         "ODbL", "Building footprints for Nepal's part of the fetch area. Footprints show buildings, not damage.",
         PILOT, "Version 2.0 (Sep 2024)", ["buildings", "exposure"], [{"name": "geometry", "type": "Polygon", "unit": "-"}], 100)
     d["worldcover-2021"] = _entry("worldcover-2021", "ESA WorldCover 2021", "Land cover incl. cropland, 10 m (real, fetched)", "Raster", "IND+NPL",
-        "ESA", "2 tiles (N24E081, N27E081)", _size_label(ext / "landcover"), "EPSG:4326", "10 m", "CC BY 4.0",
+        "ESA", "6 tiles (N24 and N27 rows; E078, E081, E084)", _size_label(ext / "landcover"), "EPSG:4326", "10 m", "CC BY 4.0",
         "Land cover classes (cropland is class 40). No crop type, season or yield.", "Tiles N24E081 and N27E081 (24-30 N, 81-84 E)", "2021", ["landcover", "cropland"],
         [{"name": "land_cover_class", "type": "UInt8", "unit": "class code"}], 2)
     d["gfm-flood"] = _entry("gfm-flood", "Copernicus GFM Flood Maps", "Observed flood extent, 20 m (real, fetched, partial)", "Raster", "IND+NPL",
@@ -80,9 +80,9 @@ def build_sdg_datasets(ext):
         "data.gov.in", "192,905 rows", _size_label(ext / "health_facilities"), "n/a", "Facility records",
         "data.gov.in terms (not checked)", "Facility list, a 2019-era snapshot (date to confirm).", "India", "2019 snapshot", ["health", "facilities"],
         [{"name": "facility", "type": "String", "unit": "-"}], 2)
-    d["norms-ind"] = _entry("norms-ind", "India Relief Norms (SDRF/NDRF)", "MHA norms PDF, 2022-26 (real, fetched)", "Document", "IND",
+    d["norms-ind"] = _entry("norms-ind", "India Relief Norms (SDRF/NDRF)", "MHA norms PDF, period 2015-20 (real, fetched; the 2022-26 letter is not on disk yet)", "Document", "IND",
         "Ministry of Home Affairs, Government of India", "1 PDF", "602 KB", "n/a", "Document", "Public document",
-        "Items and norms of assistance under SDRF/NDRF. Whether the 2026-27 revision exists is not verified.", "India", "2022-2026", ["norms", "costs"],
+        "Items and norms of assistance under SDRF/NDRF. Whether the 2026-27 revision exists is not verified.", "India", "2015-2020", ["norms", "costs"],
         [{"name": "norm", "type": "Text", "unit": "INR"}], 1)
     d["crops-npl"] = _entry("crops-npl", "Nepal District Crops (2014/15)", "Area, production, yield (real, fetched, partial)", "Table", "NPL",
         "Ministry of Agriculture via Open Data Nepal", "75 districts x 6 cereals", _size_label(ext / "crops" / "nepal_opendatanepal"), "n/a", "District level",
