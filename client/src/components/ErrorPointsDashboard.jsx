@@ -162,6 +162,7 @@
 // }
 
 
+import { API_BASE } from "../lib/apiBase";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { MapContainer, TileLayer, CircleMarker, Rectangle, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -169,8 +170,8 @@ import L from "leaflet";
 import { AlertCircle, CheckCircle2, Target, BarChart3, Eye, GripVertical } from "lucide-react";
 import { DARK_BASEMAP_URL, DARK_BASEMAP_ATTRIBUTION } from "./ImageryOverlayLayer";
 
-const DEM_API = "http://localhost:8000/api/dem";
-const PREDICT_API = "http://localhost:8000/api/predict";
+const DEM_API = `${API_BASE}/dem`;
+const PREDICT_API = `${API_BASE}/predict`;
 
 const markerIcon = new L.DivIcon({
   className: "",

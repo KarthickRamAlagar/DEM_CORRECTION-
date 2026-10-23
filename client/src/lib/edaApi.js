@@ -1,7 +1,8 @@
 // EDA API Client - talks to the FastAPI backend built in server/eda_routes.py
 // All 9 precomputed endpoints, one small function each.
 
-const BASE_URL = "http://localhost:8000/api/eda";
+import { API_BASE } from "./apiBase";
+const BASE_URL = `${API_BASE}/eda`;
 
 async function getJson(path) {
   const res = await fetch(`${BASE_URL}${path}`);

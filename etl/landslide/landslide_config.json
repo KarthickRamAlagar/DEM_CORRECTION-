@@ -1,0 +1,12 @@
+{
+  "steep_slope_classes_deg": [15, 25, 35],
+  "show_card_if_share_at_or_above_15deg": 0.10,
+  "rain_thresholds": [
+    {"id": "caine_1980", "label": "Global rainfall threshold for landslides (Caine 1980)", "a": 14.82, "b": -0.39, "meaning": "intensity (mm per hour) = a x duration (hours) to the power b",
+     "source_status": "Coefficients written from memory of the published equation. Check the paper before citing."},
+    {"id": "guzzetti_2008", "label": "Lowest global threshold (Guzzetti et al. 2008)", "a": 2.20, "b": -0.44, "meaning": "same form; a lower bound that is often passed in monsoon rain",
+     "source_status": "Coefficients written from memory of the published equation. Check the paper before citing."}
+  ],
+  "durations_h": [24, 72, 240],
+  "status": "Screening. Slope and a rain comparison, not a landslide forecast. Rain is the CHIRPS daily cell total, which can read low for short heavy rain."
+}

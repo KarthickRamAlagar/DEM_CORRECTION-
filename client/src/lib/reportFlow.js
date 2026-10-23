@@ -176,6 +176,7 @@ export class Flow {
     if (gh) { d.addImage(gh, "PNG", ghX, top, ICON, ICON); if (DEVELOPER_GITHUB_URL) d.link(ghX, top, ICON, ICON, { url: DEVELOPER_GITHUB_URL }); }
     d.setDrawColor(200, 200, 200); d.line(M, 266, W - M, 266);
     d.setFont("helvetica", "italic"); d.setFontSize(8); d.setTextColor(130, 130, 130); d.text(DISCLAIMER_LINE, M, 273, { maxWidth: this.CW });
+    d.setFont("helvetica", "normal"); d.setFontSize(7.5); d.setTextColor(110, 110, 110); d.text(this.versionLine || "Code commit: No data. Model version: No data.", M, 280, { maxWidth: this.CW - 70 });
     for (let i = 1; i <= total; i += 1) {
       d.setPage(i); d.setFont("helvetica", "normal"); d.setFontSize(8); d.setTextColor(140, 140, 140);
       d.text(`${String(i).padStart(2, "0")} / ${String(total).padStart(2, "0")}`, W / 2, 291, { align: "center" });

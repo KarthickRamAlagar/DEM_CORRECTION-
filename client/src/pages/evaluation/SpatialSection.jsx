@@ -1,7 +1,8 @@
+import { API_BASE } from "../../lib/apiBase";
 import { useEffect, useMemo, useState } from "react";
 import { Card, Stat, Note, Bars, Table, Tabs, f2, pct } from "./ui";
 
-const API = "http://localhost:8000/api/model";
+const API = `${API_BASE}/model`;
 const TABS = [
   { id: "cv", label: "Cross-validation" },
   { id: "frozen", label: "Frozen test strip" },

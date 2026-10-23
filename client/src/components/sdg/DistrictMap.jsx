@@ -1,6 +1,7 @@
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import { useQuery } from "@tanstack/react-query";
 import "leaflet/dist/leaflet.css";
+import MapFurniture from "./MapFurniture";
 import { DARK_BASEMAP_URL, DARK_BASEMAP_ATTRIBUTION } from "../ImageryOverlayLayer";
 import { fetchSdgGeojson, fetchSdgMap, fmtInt, fmtCompact, fmtMoney, NO_DATA } from "../../lib/sdgApi";
 
@@ -30,6 +31,7 @@ export default function DistrictMap({ metric, year, bound, coveredOnly, country 
       <div style={{ height: 360 }}>
         <MapContainer bounds={country === "IND" ? [[25.0, 80.3], [28.2, 86.8]] : [[26.3, 80.3], [29.0, 86.8]]} style={{ height: "100%", width: "100%" }}>
           <TileLayer url={DARK_BASEMAP_URL} attribution={DARK_BASEMAP_ATTRIBUTION} />
+          <MapFurniture />
           <GeoJSON
             key={`${country}-${metric}-${year}-${bound}-${coveredOnly}`}
             data={features}

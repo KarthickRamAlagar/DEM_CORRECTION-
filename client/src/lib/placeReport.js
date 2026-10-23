@@ -1,5 +1,6 @@
 import { jsPDF } from "jspdf";
 import { Flow, COL, num, money, range, DEV_NAME } from "./reportFlow";
+import { reportVersionLine } from "./reportVersion";
 import { elevationMap, floodMap, buildingMap, cellMap } from "./reportMaps";
 import { addEvaluation } from "./evalSections";
 
@@ -29,7 +30,7 @@ export async function buildPlaceReport({ data, meta, dem = null, extra = {}, sce
 
   // ---- page 1: title, decision card, key figures, what it tells us
   f.title("DEM-AREA-SDG report", "From the corrected elevation to people, crops and recovery need",
-    `Place: ${where}. Coordinates: ${coord}. Date used by the model: ${stamp}. River rise (what-if): ${data.rise_m} m inside a ${data.radius_km} km circle.`);
+    `Place: ${where}. Coordinates: ${coord}. ${dem?.date ? "Date used by the model" : "Report created"}: ${stamp}.${dem?.forecast ? ` River forecast day used: ${dem.forecast.label}.` : ""} River rise (what-if): ${data.rise_m} m inside a ${data.radius_km} km circle.`);
   f.h2("Result");
   f.decision({
     badge: "Estimate for planning. Not a forecast", headline: hasDem ? `Corrected ground height ${m2(dem.correctedZ)}` : "No DEM engine result carried into this run",
@@ -77,7 +78,7 @@ export async function buildPlaceReport({ data, meta, dem = null, extra = {}, sce
   f.kv([
     ["Model", eng?.model ?? "No data"], ["Validated RMSE", eng?.rmse != null ? `${eng.rmse} m` : "No data"],
     ["Confidence", eng?.reliable == null ? "No data" : eng.reliable ? "Reliable" : "Low confidence"], ["Model version", eng?.version ?? "No data"],
-    ["Uncertainty range (nominal 90%, approx.)", dem?.zLo != null ? `${m2(dem.zLo)} to ${m2(dem.zHi)}` : "No data"], ["Date used", stamp],
+    ["Uncertainty range (nominal 90%, approx.)", dem?.zLo != null ? `${m2(dem.zLo)} to ${m2(dem.zHi)}` : "No data"], [dem?.date ? "Date used" : "Report created", stamp],
   ]);
   f.h2("Location");
   f.kv([["Place", where], ["Coordinates", coord], ["Scenario circle", `${data.radius_km} km radius`], ["River rise (what-if)", `${data.rise_m} m`]]);
@@ -88,7 +89,7 @@ export async function buildPlaceReport({ data, meta, dem = null, extra = {}, sce
   f.kpi([
     { label: "Flooded, corrected DEM", value: `${num(c.flooded_km2, 1)} sq km`, sub: "Terrain what-if", color: COL.blue },
     { label: "Flooded, raw DEM", value: `${num(r.flooded_km2, 1)} sq km`, sub: "Same river rise" },
-    { label: "Difference", value: `${num(c.flooded_km2 - r.flooded_km2, 1)} sq km`, sub: "Corrected minus raw" },
+    { label: "Difference", value: `${num(Math.round(c.flooded_km2 * 10) / 10 - Math.round(r.flooded_km2 * 10) / 10, 1)} sq km`, sub: "Corrected minus raw" },
   ]);
   f.h2("Scenario settings");
   f.kv([["River rise", `${data.rise_m} m (what-if)`], ["Circle radius", `${data.radius_km} km`],
@@ -227,6 +228,7 @@ export async function buildPlaceReport({ data, meta, dem = null, extra = {}, sce
   f.bullet("The PDF layer changes presentation only. It does not change the prediction or the input data.");
 
   f.fillIndex(indexPage);
+  f.versionLine = await reportVersionLine();
   f.finish();
   void DEV_NAME;
   return doc;

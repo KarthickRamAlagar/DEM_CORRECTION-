@@ -1,0 +1,54 @@
+{
+  "_label": "Findings recorded from runs the user checked on their own machine. These are NOT recomputed by build_metric_layers.py. Edit this file only when a run is repeated.",
+  "flood_skill_hand": {
+    "recorded_on": "2026-10-21",
+    "source": "etl/sdg/flood_eval_counts.py, results in data/processed/sdg/flood_eval/ (project note: sdg-checklist-2026-10-21, section A)",
+    "design": "HAND flood rule scored against Copernicus GFM observed flood extent, 100 m, train 2019-21, test 2022-26; 5,820 of 5,839 scene-tile items scored (19 unreadable)",
+    "iou_raw": 0.005,
+    "iou_corrected": 0.005,
+    "roc_auc_raw": 0.677,
+    "roc_auc_corrected": 0.674,
+    "days_corrected_better": 96,
+    "days_compared": 176,
+    "flood_share_of_valid_test_cells": 0.0023,
+    "lift_over_random": 2.3,
+    "reading": "Raw and corrected DEM give the same flood skill. The HAND rule itself is weak. The confidence interval for corrected-better days includes 0."
+  },
+  "label_year_vs_imagery": {
+    "recorded_on": "2026-10-18",
+    "source": "golden table coverage check (project note: golden-dataset-coverage, section 7)",
+    "rows": [
+      {
+        "year": "2018",
+        "rows": 85412,
+        "matched": "2022"
+      },
+      {
+        "year": "2019",
+        "rows": 288149,
+        "matched": "2022"
+      },
+      {
+        "year": "2020",
+        "rows": 299972,
+        "matched": "2022"
+      },
+      {
+        "year": "2021",
+        "rows": 242450,
+        "matched": "2022"
+      },
+      {
+        "year": "2022",
+        "rows": 252644,
+        "matched": "2022"
+      },
+      {
+        "year": "2023",
+        "rows": 52727,
+        "matched": "2023"
+      }
+    ],
+    "reading": "915,983 rows (75.0%) with 2018-2021 labels use 2022 imagery. Only 2022 and 2023 labels (24.9%) match the imagery year. Counts are from the old 1,221,354-row table."
+  }
+}

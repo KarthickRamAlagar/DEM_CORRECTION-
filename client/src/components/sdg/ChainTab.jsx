@@ -4,6 +4,8 @@ import { Download } from "lucide-react";
 import { fetchScenario, fmtInt, fmtCompact, fmtMoney, fmtRange, fmtPct, NO_DATA } from "../../lib/sdgApi";
 import { Banner, Segmented, StatCard, Section } from "./Ui";
 import MapTabs from "./MapTabs";
+import CoordinateBox from "./CoordinateBox";
+import MapDescription from "./MapDescription";
 import { buildPlaceReport } from "../../lib/placeReport";
 
 const STEPS = [
@@ -85,7 +87,9 @@ export default function ChainTab({ initialPoint, technical, meta }) {
       </div>
 
       <div className="mt-3">
+        <div className="mb-3"><CoordinateBox point={point} onPick={setPoint} /></div>
         <MapTabs point={point} radiusKm={radius} overlay={d?.overlay} onPick={setPoint} />
+        <MapDescription d={d} />
       </div>
 
       {!point && <div className="mt-3"><Banner tone="amber">Click the map inside the dashed box to choose a place, or open this page from "New Inputs" after a prediction.</Banner></div>}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { MotionConfig } from "framer-motion";
 import { LayoutDashboard, Database, Radar, BarChart3, Sparkles, MessageCircleQuestion, Layers,TextCursorInput,Settings } from "lucide-react";
 import IconRail from "./components/IconRail";
@@ -19,6 +19,7 @@ import ApplicationTour from "./components/ApplicationTour";
 import SettingsPage from "./pages/SettingsPage";
 import EvaluationMetricsPage from "./pages/EvaluationMetricsPage";
 import SdgPage from "./pages/SdgPage";
+import OpsDashboardPage from "./pages/OpsDashboardPage";
 import { Target } from "lucide-react";
 import { getSettings } from "./lib/settingsStore";
 import { useSettings } from "./lib/useSettings";
@@ -35,8 +36,11 @@ const MOBILE_ICONS = {
    settings: Settings, 
 };
 
+const PAGE_IDS = ["datasets", "spatial", "eda", "ask", "elevation-correction", "new-inputs", "evaluation", "sdg", "settings", "ops"];
+const readPage = () => { try { const h = window.location.hash.replace(/^#/, ""); return PAGE_IDS.includes(h) ? h : null; } catch (e) { return null; } };
+
 export default function App() {
-  const [active, setActive] = useState(() => { try { return sessionStorage.getItem("app_active") === "sdg" ? "sdg" : "dashboard"; } catch (e) { return "dashboard"; } });
+  const [active, setActive] = useState(() => { const hp = readPage(); if (hp) return hp; try { return sessionStorage.getItem("app_active") === "sdg" ? "sdg" : "dashboard"; } catch (e) { return "dashboard"; } });
   const settings = useSettings();
   const [collapsed, setCollapsed] = useState(() => getSettings().sidebarCollapsedDefault);
 
@@ -47,7 +51,21 @@ export default function App() {
   }, [settings.sidebarCollapsedDefault]);
   const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
 useEffect(() => { const h = (e) => { if (e && e.detail) setActive(e.detail); }; window.addEventListener("app-navigate", h); return () => window.removeEventListener("app-navigate", h); }, []);
+  useEffect(() => { const go = () => { if (window.location.hash === "#ops") setActive("ops"); }; go(); window.addEventListener("hashchange", go); return () => window.removeEventListener("hashchange", go); }, []);
   useEffect(() => { try { if (active === "sdg") sessionStorage.setItem("app_active", "sdg"); else sessionStorage.removeItem("app_active"); } catch (e) { /* storage blocked */ } }, [active]);
+  const firstUrlSync = useRef(true);
+  useEffect(() => {    // the address bar follows the page: #sdg, #datasets, ... (the dashboard has no hash)
+    try {
+      const want = active === "dashboard" ? "" : "#" + active; const base = window.location.pathname + window.location.search;
+      if (window.location.hash !== want) { if (firstUrlSync.current) window.history.replaceState(null, "", base + want); else window.history.pushState(null, "", base + want); }
+    } catch (e) { /* ignore */ }
+    firstUrlSync.current = false;
+  }, [active]);
+  useEffect(() => {    // Back / Forward and typed addresses change the page
+    const onHash = () => setActive(readPage() ?? "dashboard");
+    window.addEventListener("hashchange", onHash); window.addEventListener("popstate", onHash);
+    return () => { window.removeEventListener("hashchange", onHash); window.removeEventListener("popstate", onHash); };
+  }, []);
   const [selectedId, setSelectedId] = useState(DEFAULT_SATELLITE_ID);
 
   const tleEntries = useTleCatalog();
@@ -134,7 +152,7 @@ useEffect(() => { const h = (e) => { if (e && e.detail) setActive(e.detail); }; 
             <NewInputsPage />
           </div>
         )}
-        {active === "evaluation" && <div className="flex-1 min-w-0 h-full pb-14 lg:pb-0"><EvaluationMetricsPage /></div>} {active === "sdg" && <div className="flex-1 min-w-0 h-full pb-14 lg:pb-0"><SdgPage /></div>}
+        {active === "evaluation" && <div className="flex-1 min-w-0 h-full pb-14 lg:pb-0"><EvaluationMetricsPage /></div>} {active === "sdg" && <div className="flex-1 min-w-0 h-full pb-14 lg:pb-0"><SdgPage /></div>} {active === "ops" && <div className="flex-1 min-w-0 h-full pb-14 lg:pb-0"><OpsDashboardPage /></div>}
 
         {active === "settings" && (
           <div className="flex-1 min-w-0 h-full pb-14 lg:pb-0">

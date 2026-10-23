@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { MapContainer, TileLayer, ImageOverlay, Rectangle, Circle, CircleMarker, useMap, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import MapFurniture from "./MapFurniture";
 import { DARK_BASEMAP_URL, DARK_BASEMAP_ATTRIBUTION } from "../ImageryOverlayLayer";
 import { fetchRegionMaps, fmtInt, fmtPct, NO_DATA } from "../../lib/sdgApi";
 import { Banner, Segmented, DataTable } from "./Ui";
@@ -30,6 +31,7 @@ function FloodMap({ id, title, image, bounds, view, setView, point, radiusKm, he
       <div className="overflow-hidden rounded-xl border border-ink-700/60" style={{ height }}>
         <MapContainer bounds={BOX} boundsOptions={{ padding: [6, 6] }} zoomSnap={0.25} zoomDelta={0.5} style={{ height: "100%", width: "100%" }}>
           <TileLayer url={DARK_BASEMAP_URL} attribution={DARK_BASEMAP_ATTRIBUTION} />
+          <MapFurniture />
           <Rectangle bounds={BOX} pathOptions={{ color: "#5eead4", weight: 1, fill: false, dashArray: "6 6" }} />
           <ImageOverlay url={`data:image/png;base64,${image}`} bounds={bounds} opacity={0.95} />
           {point && <Circle center={[point.lat, point.lng]} radius={(radiusKm ?? 10) * 1000} pathOptions={{ color: "#facc15", weight: 2, fill: false }} />}

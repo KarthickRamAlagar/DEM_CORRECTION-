@@ -1,0 +1,5 @@
+[
+  {"name": "event_2022_09_30", "obs_date": "2022-09-30", "observed": "data/processed/sdg/physics/obs/2022-09-30.tif"},
+  {"name": "event_2023_08_15", "obs_date": "2023-08-15", "observed": "data/processed/sdg/physics/obs/2023-08-15.tif"},
+  {"name": "event_2024_09_05", "obs_date": "2024-09-05", "observed": "data/processed/sdg/physics/obs/2024-09-05.tif"}
+]

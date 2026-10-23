@@ -36,6 +36,11 @@ dependencies = [
     "catboost>=1.2.0",
     "joblib>=1.4.0",
     "optuna>=5.0.0",
+    "mlflow>=3.17.2",
+    "cdsapi>=0.7.7",
+    "xarray>=2025.6.1",
+    "netcdf4>=1.7.3",
+    "pypdf>=6.21.2",
 ]
 
 [project.scripts]

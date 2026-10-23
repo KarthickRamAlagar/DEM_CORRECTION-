@@ -1,6 +1,7 @@
 // Datasets API Client - talks to server/datasets_routes.py
 
-const BASE_URL = "http://localhost:8000/api/datasets";
+import { API_BASE } from "./apiBase";
+const BASE_URL = `${API_BASE}/datasets`;
 
 async function getJson(path) {
   const res = await fetch(`${BASE_URL}${path}`);

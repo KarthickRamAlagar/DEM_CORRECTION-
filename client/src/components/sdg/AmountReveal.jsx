@@ -27,7 +27,7 @@ export default function AmountReveal({ countries, totalInr, onClose }) {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h3 id="amt-title" className="text-[20px] font-semibold text-white">How much money is needed</h3>
-            <p className="mt-1 text-[13.5px] text-ink-200">Estimated recovery need using the corrected DEM from the DEM engine.</p>
+            <p className="mt-1 text-[13.5px] text-ink-200">Estimated recovery need from flood exposure, run on the corrected elevation model.</p>
           </div>
           {finished && <button ref={btn} type="button" onClick={onClose} aria-label="Close" className="inline-flex items-center gap-1.5 rounded-lg border border-ink-600 px-3 py-1.5 text-[13px] font-medium text-ink-100 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-signal-teal"><X size={14} aria-hidden /> Close</button>}
         </div>

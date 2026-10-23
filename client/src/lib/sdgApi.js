@@ -1,6 +1,7 @@
 // SDG API client - talks to server/sdg_routes.py (read-only)
 
-const BASE_URL = "http://localhost:8000/api/sdg";
+import { API_BASE } from "./apiBase";
+const BASE_URL = `${API_BASE}/sdg`;
 
 async function getJson(path, params = {}) {
   const qs = new URLSearchParams(Object.entries(params).map(([k, v]) => [k, String(v)])).toString();

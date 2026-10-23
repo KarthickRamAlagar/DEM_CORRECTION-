@@ -9,6 +9,10 @@ import { Banner, Segmented, Figures, DataTable, SdgChip, Tabs } from "./Ui";
 import EmptyState from "./EmptyState";
 import { NutritionPanel, EconPanels, CropPanel, nutritionFigure, econFigures, cropFigure } from "./ContextPanels";
 import MapTabs from "./MapTabs";
+import PointOutlook from "./PointOutlook";
+import ForecastBadge from "./ForecastBadge";
+import { forecastLabel } from "../../lib/dateFmt";
+import MapDescription from "./MapDescription";
 import AmountReveal from "./AmountReveal";
 import RegionFloodMaps from "./RegionFloodMaps";
 import { Curve } from "./ChainTab";
@@ -139,7 +143,7 @@ export default function GuidedFlow({ seed, meta, onExit }) {
   const fromDem = !!seed && seed.from === "dem-engine";
   const [point, setPoint] = useState(seed ? { lat: seed.lat, lng: seed.lng } : null);
   const [radius, setRadius] = useState(10);
-  const [rise, setRise] = useState(2);
+  const [rise, setRise] = useState(seed?.riseM ?? 2);
   const [started, setStarted] = useState(false);
   const [idx, setIdx] = useState(0);
   const [maxIdx, setMaxIdx] = useState(0);
@@ -266,6 +270,8 @@ export default function GuidedFlow({ seed, meta, onExit }) {
             ) : (
               <MapTabs point={point} radiusKm={radius} onPick={setPoint} />
             )}
+            <ForecastBadge seed={seed} />
+            <PointOutlook point={point} seed={seed} rise={rise} />
             <h3 className="mt-8 mb-3 text-[16px] font-semibold text-white">Scenario settings</h3>
             <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
               <label className="flex items-center gap-3 text-[14px] text-ink-100">
@@ -307,6 +313,7 @@ export default function GuidedFlow({ seed, meta, onExit }) {
                   <RegionFloodMaps point={point} radiusKm={radius} defaultRise={rise} defaultCountry={d.here?.iso === "IND" ? "IND" : "NPL"} />
                   <Heading>Around your place</Heading>
                   <MapTabs point={point} radiusKm={radius} overlay={d.overlay} />
+                  <MapDescription d={d} />
                 </>
               )}
               {floodTab === "view3d" && (
@@ -466,7 +473,7 @@ export default function GuidedFlow({ seed, meta, onExit }) {
 
         {!blocked && idx === LAST && (
           <div className="mt-6 max-w-2xl">
-            <p className="text-[14px] leading-relaxed text-ink-200">The PDF takes you from your DEM engine result through the flood scenario, people and buildings, land and crops, to the micro and macro economics, then the model evaluation, with the method notes and developer footer on the last page.</p>
+            <p className="text-[14px] leading-relaxed text-ink-200">The PDF takes you from {fromDem ? "your DEM engine result" : seed?.forecast ? "the river forecast day you chose" : "the place you chose"} through the flood scenario, people and buildings, land and crops, to the micro and macro economics, then the model evaluation, with the method notes and developer footer on the last page.</p>
             <div className="mt-5">
               {d ? (
                 <button type="button" onClick={async () => {
@@ -478,7 +485,7 @@ export default function GuidedFlow({ seed, meta, onExit }) {
                     ]);
                     const evalData = await loadEvalData();
                     const doc = await buildPlaceReport({ data: d, meta, scene, region, evalData,
-                      dem: seed ? { lat: seed.lat, lng: seed.lng, rawZ: seed.rawZ, correctedZ: seed.correctedZ, zLo: seed.zLo, zHi: seed.zHi, date: seed.date, inputs: seed.inputs, engine: seed.engine } : null,
+                      dem: seed ? { lat: seed.lat, lng: seed.lng, rawZ: seed.rawZ, correctedZ: seed.correctedZ, zLo: seed.zLo, zHi: seed.zHi, date: seed.date, inputs: seed.inputs, engine: seed.engine, forecast: seed.forecast ? { label: forecastLabel(seed.forecast) } : null } : null,
                       extra: { nutrition: nutritionFigure(iso, focus), crop: cropFigure(iso, cropQ.data, c.cropland_ha), econ: econFigures(iso, focus) } });
                     doc.save(reportFileName(d));
                   } finally { setPdfBusy(false); }

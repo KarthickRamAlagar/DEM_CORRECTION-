@@ -1,3 +1,4 @@
+import { API_BASE } from "../lib/apiBase";
 import { useEffect, useState } from "react";
 import { satelliteCatalog } from "../data/satelliteCatalog";
 import { fallbackTle } from "../lib/fallbackTle";
@@ -10,7 +11,7 @@ import { buildSatrec } from "../lib/orbitEngine";
 // talks to CelesTrak directly, on a controlled schedule, with shared
 // caching across all users/tabs.
 const TLE_PROXY_URL = (name) =>
-  `http://localhost:8000/api/tle/${encodeURIComponent(name)}`;
+  `${API_BASE}/tle/${encodeURIComponent(name)}`;
 
 // CelesTrak only updates GP data every 2 hours and explicitly enforces this
 // with HTTP 403s — repeated requests within that window can get an IP

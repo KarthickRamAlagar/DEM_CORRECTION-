@@ -9,6 +9,7 @@ import { Banner, Segmented, StatCard, Section } from "../components/sdg/Ui";
 import DistrictTable from "../components/sdg/DistrictTable";
 import YearBars from "../components/sdg/YearBars";
 import ChainTab from "../components/sdg/ChainTab";
+import FuturePredictionTab from "../components/sdg/FuturePredictionTab";
 import DistrictMap from "../components/sdg/DistrictMap";
 import FlowIntro from "../components/sdg/FlowIntro";
 import RegionFloodMaps from "../components/sdg/RegionFloodMaps";
@@ -23,6 +24,7 @@ const TABS = [
   { id: "sdg11", label: "SDG 11 Resilient Communities" },
   { id: "sdg12", label: "SDG 12 Land and Production" },
   { id: "funding", label: "Funding need" },
+  { id: "future", label: "Future prediction" },
   { id: "about", label: "Assumptions and limits" },
 ];
 const COUNTRIES = [{ id: "IND", label: "India" }, { id: "NPL", label: "Nepal (Terai)" }];
@@ -34,6 +36,7 @@ export default function SdgPage() {
   const [seed, setSeed] = useState(payload);
   const [needDem, setNeedDem] = useState(false);       // shown when someone tries an action before running the DEM engine
   const goNewInputs = () => window.dispatchEvent(new CustomEvent("app-navigate", { detail: "new-inputs" }));
+  const startFlowAt = (pt) => { setSeed({ lat: pt.lat, lng: pt.lng, rawZ: null, correctedZ: null, zLo: null, zHi: null, date: null, from: "map", inputs: null, engine: null, forecast: pt.forecast ?? null, riseM: pt.forecast?.riseM ?? null }); setMode("flow"); };
   const tryAction = (run) => () => { if (payload) { setNeedDem(false); run(); } else setNeedDem(true); };
   useEffect(() => { clearPayload(); }, []);
   // The app is a fixed-height screen. Keep the browser window itself from scrolling (a tall 3D canvas can otherwise push the whole app up and leave blank space).
@@ -85,7 +88,7 @@ export default function SdgPage() {
 
         {mode === "intro" && (
           <>
-            <FlowIntro onStart={tryAction(() => { setSeed(payload); setMode("flow"); })} onExplore={tryAction(() => setMode("explore"))} />
+            <FlowIntro onStart={tryAction(() => { setSeed(payload); setMode("flow"); })} onExplore={() => setMode("explore")} />
             {needDem && <NeedDemModal onGo={goNewInputs} />}
           </>
         )}
@@ -98,8 +101,8 @@ export default function SdgPage() {
         </div>
 
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          {!["chain", "region"].includes(tab) && <Segmented options={COUNTRIES} value={country} onChange={setCountry} />}
-          {!["chain", "region"].includes(tab) && <select
+          {!["chain", "region", "future"].includes(tab) && <Segmented options={COUNTRIES} value={country} onChange={setCountry} />}
+          {!["chain", "region", "future"].includes(tab) && <select
             value={year}
             onChange={(e) => setYear(e.target.value)}
             className="rounded-lg border border-ink-700/70 bg-ink-900/60 px-3 py-1.5 text-[13px] text-ink-100"
@@ -108,8 +111,8 @@ export default function SdgPage() {
             {(meta.data?.years ?? []).map((y) => <option key={y} value={y}>{y}</option>)}
           </select>}
           {["sdg2", "sdg11", "funding"].includes(tab) && <Segmented options={BOUNDS} value={bound} onChange={setBound} />}
-          <Segmented options={[{ id: "simple", label: "Simple" }, { id: "technical", label: "Technical" }]} value={view} onChange={setView} />
-          {!["chain", "region"].includes(tab) && (
+          {tab !== "future" && <Segmented options={[{ id: "simple", label: "Simple" }, { id: "technical", label: "Technical" }]} value={view} onChange={setView} />}
+          {!["chain", "region", "future"].includes(tab) && (
             <label className="flex items-center gap-1.5 text-[13px] text-ink-200">
               <input type="checkbox" checked={coveredOnly} onChange={(e) => setCoveredOnly(e.target.checked)} />
               Only districts with 99%+ satellite coverage
@@ -134,7 +137,7 @@ export default function SdgPage() {
         {(summary.isError || meta.isError) && (
           <div className="mt-4"><Banner tone="amber">The SDG API did not answer. Start the server and check that the SDG tables exist (etl/sdg). Nothing is shown instead of guessing.</Banner></div>
         )}
-        {s && !["chain", "region"].includes(tab) && (
+        {s && !["chain", "region", "future"].includes(tab) && (
           <p className="mt-3 text-[12.5px] text-ink-300">
             {s.districts_total - s.districts_left_out} of {s.districts_total} districts shown
             {coveredOnly && s.districts_left_out > 0 ? `; ${s.districts_left_out} left out for partial satellite coverage` : ""}.
@@ -143,6 +146,7 @@ export default function SdgPage() {
         )}
 
         {tab === "region" && <div className="mt-5"><RegionFloodMaps /></div>}
+        {tab === "future" && <FuturePredictionTab onStartFlow={startFlowAt} />}
         {tab === "chain" && <ChainTab initialPoint={chainPoint ? { lat: chainPoint.lat, lng: chainPoint.lng } : null} technical={view === "technical"} meta={meta.data} />}
 
         {tab === "sdg2" && s && (

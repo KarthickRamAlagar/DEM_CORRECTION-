@@ -1,8 +1,9 @@
+import { API_BASE as API_BASE_ROOT } from "../lib/apiBase";
 import { useState, useEffect } from "react";
 import MapComparisonView from "../components/MapComparisonView";
 import ErrorPointsDashboard from "../components/ErrorPointsDashboard";
 
-const API_BASE = "http://localhost:8000/api/dem";
+const API_BASE = `${API_BASE_ROOT}/dem`;
 
 export default function ElevationCorrectionPage() {
   const [availableYears, setAvailableYears] = useState([]);

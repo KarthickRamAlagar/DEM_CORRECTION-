@@ -132,5 +132,5 @@ export function cropFigure(iso, data, ha) {
   if (iso === "NPL") return { label: "Crop yield and value at risk", value: NO_DATA, noData: true, sub: "No current Nepal yield table" };
   const val = riceValueRange(data, ha);
   if (!val) return { label: "Rice value on flooded cropland", value: NO_DATA, noData: true, sub: "Build the yield table (etl/sdg/crop_yield_state.py)" };
-  return { label: "Rice on flooded cropland, at MSP", value: croreRange(val), sub: "A ceiling at the government price, not a loss estimate" };
+  return { label: "Rice on flooded cropland, at MSP", value: croreRange(val), sub: "A ceiling at the government support price. Not a loss estimate and not part of the recovery need" };
 }

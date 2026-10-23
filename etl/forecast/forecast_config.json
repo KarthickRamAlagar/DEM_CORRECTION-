@@ -1,0 +1,10 @@
+{
+  "tiers": {
+    "rl2":  {"label": "Above the 1-in-2-year flow",  "assumed_river_rise_m": 1.0},
+    "rl5":  {"label": "Above the 1-in-5-year flow",  "assumed_river_rise_m": 2.0},
+    "rl20": {"label": "Above the 1-in-20-year flow", "assumed_river_rise_m": 4.0}
+  },
+  "alert": {"expected_at_or_above": 0.5, "possible_at_or_above": 0.2},
+  "river_cell_search_km": 15,
+  "status": "Planning assumption, not calibrated. The river-rise values map a flow level to the terrain what-if; they are not measured water levels. Change them here and restart."
+}

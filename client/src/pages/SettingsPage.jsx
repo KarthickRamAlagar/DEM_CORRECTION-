@@ -1,3 +1,4 @@
+import { API_ORIGIN } from "../lib/apiBase";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -11,7 +12,7 @@ import {
 import { speakText, stopSpeaking, listVoices } from "../lib/speakText";
 import { playTingSound } from "../lib/notificationSound";
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = API_ORIGIN;
 const MODEL_INFO_URL = `${API_BASE}/api/model/info`;
 const TLE_CACHE_PREFIX = "leo-dashboard:tle:v1:"; // same prefix useTleCatalog.js writes
 

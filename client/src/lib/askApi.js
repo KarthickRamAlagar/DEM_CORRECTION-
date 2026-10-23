@@ -1,4 +1,5 @@
-const BASE_URL = "http://localhost:8000/api/ask";
+import { API_BASE } from "./apiBase";
+const BASE_URL = `${API_BASE}/ask`;
 
 export async function askQuestion(question) {
   const res = await fetch(BASE_URL, {

@@ -1,3 +1,4 @@
+import { API_BASE } from "../lib/apiBase";
 import SdgContinueButton from "../components/sdg/SdgContinueButton";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { MapContainer, TileLayer, Rectangle, Marker, useMapEvents } from "react-leaflet";
@@ -10,7 +11,7 @@ import { speakText } from "../lib/speakText";
 import { playTingSound } from "../lib/notificationSound";
 import { getSettings } from "../lib/settingsStore";
 
-const PREDICT_API = "http://localhost:8000/api/predict";
+const PREDICT_API = `${API_BASE}/predict`;
 
 import { DEVELOPER_GITHUB_URL, DEVELOPER_LINKEDIN_URL, makeIconPng } from "../lib/developerLinks";
 const STUDY_BOUNDS = [[25, 80], [28, 84]];

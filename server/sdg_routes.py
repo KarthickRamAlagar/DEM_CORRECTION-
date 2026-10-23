@@ -192,3 +192,27 @@ def districts(country: str = "IND", year: str = "ever", bound: str = "upper_unio
 from .sdg_chain_routes import router as _chain_router  # noqa: E402
 
 router.include_router(_chain_router)
+from .sdg_version_routes import router as _version_router  # noqa: E402
+
+router.include_router(_version_router)
+from .sdg_outlook_routes import router as _outlook_router  # noqa: E402
+
+router.include_router(_outlook_router)
+from .sdg_outlook_point_routes import router as _outlook_point_router  # noqa: E402
+
+router.include_router(_outlook_point_router)
+from .sdg_outlook_rain_routes import router as _rain_router  # noqa: E402
+
+router.include_router(_rain_router)
+from .sdg_forecast_routes import router as _forecast_router  # noqa: E402
+
+router.include_router(_forecast_router)
+from .sdg_replay_routes import router as _replay_router  # noqa: E402
+
+router.include_router(_replay_router)
+from .sdg_landslide_routes import router as _landslide_router  # noqa: E402
+
+router.include_router(_landslide_router)
+from .sdg_physics_routes import router as _physics_router  # noqa: E402
+
+router.include_router(_physics_router)

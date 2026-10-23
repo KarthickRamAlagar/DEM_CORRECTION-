@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { MapContainer, TileLayer, Circle, CircleMarker, ImageOverlay, Rectangle, useMap, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import MapFurniture from "./MapFurniture";
 import { DARK_BASEMAP_URL, DARK_BASEMAP_ATTRIBUTION } from "../ImageryOverlayLayer";
 
 const LAYER_BOX = [[25.4, 81.9], [28.0, 84.0]];   // river-height layer coverage
@@ -26,6 +27,7 @@ export default function PlaceMap({ point, radiusKm, overlay, onPick }) {
     <div className="relative rounded-xl overflow-hidden border border-ink-700/70" style={{ height: 380 }}>
       <MapContainer bounds={LAYER_BOX} style={{ height: "100%", width: "100%" }}>
         <TileLayer url={DARK_BASEMAP_URL} attribution={DARK_BASEMAP_ATTRIBUTION} />
+        <MapFurniture />
         <Rectangle bounds={LAYER_BOX} pathOptions={{ color: "#5eead4", weight: 1.5, fill: false, dashArray: "6 6" }} />
         {overlay && <ImageOverlay url={`data:image/png;base64,${overlay.png}`} bounds={overlay.bounds} opacity={0.9} />}
         {point && <Circle center={[point.lat, point.lng]} radius={radiusKm * 1000} pathOptions={{ color: "#facc15", weight: 2, fill: false }} />}

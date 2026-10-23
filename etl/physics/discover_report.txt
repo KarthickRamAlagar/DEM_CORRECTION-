@@ -1,0 +1,173 @@
+== DEM rasters
+raw_dem_2022.tif 622.1 MB EPSG:4326 res (0.0002777777777777778, 0.0002777777777777778) shape (10800, 14400) bounds (80.0, 25.0, 84.0, 28.0) nodata -32768.0
+corrected_dem_2022.tif 622.1 MB EPSG:4326 res (0.0002777777777777778, 0.0002777777777777778) shape (10800, 14400) bounds (80.0, 25.0, 84.0, 28.0) nodata -32768.0
+
+== HAND / channel rasters
+data\processed\sdg\hand\hand_corrected_2022.tif 304.6 MB
+data\processed\sdg\hand\hand_raw_2022.tif 305.0 MB
+data\processed\sdg\hand\region_flood_cache.npz 6.6 MB
+
+== OSM files (rivers/streams)
+data\external\osm\osm_81.90_25.40.json 2.6 MB
+data\external\osm\osm_81.90_25.90.json 2.0 MB
+data\external\osm\osm_81.90_26.40.json 2.4 MB
+data\external\osm\osm_81.90_26.90.json 2.3 MB
+data\external\osm\osm_81.90_27.40.json 1.9 MB
+data\external\osm\osm_81.90_27.90.json 1.6 MB
+data\external\osm\osm_82.40_25.40.json 2.5 MB
+data\external\osm\osm_82.40_25.90.json 1.5 MB
+data\external\osm\osm_82.40_26.40.json 1.8 MB
+data\external\osm\osm_82.40_26.90.json 1.5 MB
+data\external\osm\osm_82.40_27.40.json 3.0 MB
+data\external\osm\osm_82.40_27.90.json 1.7 MB
+data\external\osm\osm_82.90_25.40.json 2.1 MB
+data\external\osm\osm_82.90_25.90.json 2.6 MB
+data\external\osm\osm_82.90_26.40.json 2.6 MB
+data\external\osm\osm_82.90_26.90.json 1.9 MB
+data\external\osm\osm_82.90_27.40.json 5.1 MB
+data\external\osm\osm_82.90_27.90.json 2.1 MB
+data\external\osm\osm_83.40_25.40.json 1.9 MB
+data\external\osm\osm_83.40_25.90.json 1.5 MB
+data\external\osm\osm_83.40_26.40.json 3.7 MB
+data\external\osm\osm_83.40_26.90.json 1.6 MB
+data\external\osm\osm_83.40_27.40.json 5.9 MB
+data\external\osm\osm_83.40_27.90.json 3.1 MB
+data\external\osm\osm_83.90_25.40.json 0.5 MB
+data\external\osm\osm_83.90_25.90.json 0.4 MB
+data\external\osm\osm_83.90_26.40.json 1.5 MB
+data\external\osm\osm_83.90_26.90.json 1.2 MB
+data\external\osm\osm_83.90_27.40.json 2.4 MB
+data\external\osm\osm_83.90_27.90.json 1.4 MB
+data\external\osm\SOURCE.json 0.0 MB
+
+== GFM flood files
+by extension: {'.csv': 1, '.json': 1, '.tif': 17281}
+data\external\flood_observed\gfm\SOURCE.json 0.0 MB
+data\external\flood_observed\gfm\advisory_flags\2019\06\ADVFLAG_20190602T001033_VV_AS020M_E033N027T3.tif 0.1 MB
+data\external\flood_observed\gfm\advisory_flags\2019\06\ADVFLAG_20190602T001058_VV_AS020M_E033N027T3.tif 0.2 MB
+data\external\flood_observed\gfm\advisory_flags\2019\06\ADVFLAG_20190602T001123_VV_AS020M_E033N024T3.tif 0.1 MB
+data\external\flood_observed\gfm\advisory_flags\2019\06\ADVFLAG_20190602T001123_VV_AS020M_E033N027T3.tif 0.1 MB
+data\external\flood_observed\gfm\advisory_flags\2019\06\ADVFLAG_20190604T122927_VV_AS020M_E030N024T3.tif 0.3 MB
+data\external\flood_observed\gfm\advisory_flags\2019\06\ADVFLAG_20190604T122927_VV_AS020M_E033N024T3.tif 0.3 MB
+data\external\flood_observed\gfm\advisory_flags\2019\06\ADVFLAG_20190604T122956_VV_AS020M_E030N024T3.tif 0.3 MB
+data\external\flood_observed\gfm\advisory_flags\2019\06\ADVFLAG_20190604T122956_VV_AS020M_E030N027T3.tif 0.1 MB
+data\external\flood_observed\gfm\advisory_flags\2019\06\ADVFLAG_20190604T122956_VV_AS020M_E033N024T3.tif 0.3 MB
+data\external\flood_observed\gfm\advisory_flags\2019\06\ADVFLAG_20190604T122956_VV_AS020M_E033N027T3.tif 0.1 MB
+data\external\flood_observed\gfm\advisory_flags\2019\06\ADVFLAG_20190604T123046_VV_AS020M_E030N027T3.tif 0.2 MB
+data\external\flood_observed\gfm\advisory_flags\2019\06\ADVFLAG_20190604T123046_VV_AS020M_E033N027T3.tif 0.2 MB
+data\external\flood_observed\gfm\advisory_flags\2019\06\ADVFLAG_20190606T121314_VV_AS020M_E033N024T3.tif 0.1 MB
+
+== GloFAS history files
+glofas_hist_2005.nc 0.6 MB
+glofas_hist_2006.nc 0.6 MB
+glofas_hist_2007.nc 0.7 MB
+glofas_hist_2008.nc 0.7 MB
+glofas_hist_2009.nc 0.6 MB
+glofas_hist_2010.nc 0.6 MB
+glofas_hist_2011.nc 0.6 MB
+glofas_hist_2012.nc 0.6 MB
+glofas_hist_2013.nc 0.7 MB
+glofas_hist_2014.nc 0.6 MB
+glofas_hist_2015.nc 0.6 MB
+glofas_hist_2016.nc 0.7 MB
+glofas_hist_2017.nc 0.6 MB
+glofas_hist_2018.nc 0.6 MB
+glofas_hist_2019.nc 0.7 MB
+glofas_hist_2020.nc 0.7 MB
+glofas_hist_2021.nc 0.7 MB
+glofas_hist_2022.nc 0.6 MB
+glofas_hist_2023.nc 0.7 MB
+glofas_hist_2024.nc 0.7 MB
+glofas_hist_2025.nc 0.6 MB
+
+== flood_eval_counts.py (first 90 lines)
+  1 """Score HAND<=threshold (raw vs corrected DEM) against GFM observed flood, per scene-tile item, at 100 m.
+  2 Writes only small count tables to data/processed/sdg/flood_eval/. Valid pixel = observed (flood!=255) AND exclusion==0 AND ref_water!=1
+  3 (strict variant also drops ref_water==2). Exclusion/ref-water meanings are INFERRED from data patterns, not documentation."""
+  4 import sys, os, time, argparse
+  5 from functools import lru_cache
+  6 import numpy as np, pandas as pd, rasterio
+  7 from rasterio import Affine
+  8 from rasterio.warp import reproject, Resampling
+  9 
+ 10 sys.stdout.reconfigure(encoding="utf-8")
+ 11 ROOT = "C:/Users/KARTHI/Documents/DEM_CORRECTION_reorganized/"
+ 12 GFM = ROOT + "data/external/flood_observed/gfm/"
+ 13 HANDF = {"raw": ROOT + "data/processed/sdg/hand/hand_raw_2022.tif",
+ 14          "corrected": ROOT + "data/processed/sdg/hand/hand_corrected_2022.tif"}
+ 15 OUTDIR = ROOT + "data/processed/sdg/flood_eval/"
+ 16 DEC = 5
+ 17 TH = [0.25, 0.5, 0.75, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 15, 20]
+ 18 
+ 19 ap = argparse.ArgumentParser()
+ 20 ap.add_argument("--limit", type=int, default=0, help="test: only first N items, writes item_counts_test.csv")
+ 21 ap.add_argument("--resume", action="store_true")
+ 22 args = ap.parse_args()
+ 23 OUT = OUTDIR + ("item_counts_test.csv" if args.limit else "item_counts.csv")
+ 24 
+ 25 df = pd.read_csv(GFM + "items.csv")
+ 26 df["datetime"] = pd.to_datetime(df["datetime"], utc=True)
+ 27 df["day"] = df["datetime"].dt.strftime("%Y-%m-%d")
+ 28 df["flag"] = df["anomaly_detected"].astype(str)
+ 29 df = df.sort_values(["reference_water", "datetime"]).reset_index(drop=True)
+ 30 if args.limit:
+ 31     df = df.head(args.limit)
+ 32     if os.path.exists(OUT): os.remove(OUT)
+ 33 done = set()
+ 34 if os.path.exists(OUT):
+ 35     if not args.resume:
+ 36         sys.exit("results exist - use --resume to continue (nothing overwritten)")
+ 37     done = set(pd.read_csv(OUT, usecols=["id"])["id"])
+ 38     print("already done:", len(done))
+ 39 todo = df[~df["id"].isin(done)]
+ 40 print("items to score:", len(todo), "of", len(df))
+ 41 
+ 42 def P(rel): return GFM + str(rel).replace("\\", "/")
+ 43 
+ 44 # per-tile 100 m grid + HAND resampled onto it (point sampling, nearest)
+ 45 grid = {}
+ 46 for tile in df["tile"].unique():
+ 47     first = df[df["tile"] == tile].iloc[0]
+ 48     with rasterio.open(P(first["flood_extent"])) as s:
+ 49         crs, tr, h, w = s.crs, s.transform * Affine.scale(DEC, DEC), s.height // DEC, s.width // DEC
+ 50     hh = {}
+ 51     for k, p in HANDF.items():
+ 52         dst = np.full((h, w), np.nan, dtype="float32")
+ 53         with rasterio.open(p) as hs:
+ 54             reproject(source=rasterio.band(hs, 1), destination=dst, dst_transform=tr, dst_crs=crs,
+ 55                       dst_nodata=np.nan, src_nodata=hs.nodata, resampling=Resampling.nearest)
+ 56         hh[k] = dst
+ 57     common = np.isfinite(hh["raw"]) & np.isfinite(hh["corrected"])
+ 58     grid[tile] = (hh, common)
+ 59     print(f"tile {tile}: HAND cells inside analysis box = {int(common.sum()):,}")
+ 60 
+ 61 def rd(path, shape):
+ 62     with rasterio.open(path) as s:
+ 63         return s.read(1, out_shape=shape, resampling=Resampling.nearest)
+ 64 
+ 65 @lru_cache(maxsize=6)
+ 66 def refwater(path, shape): return rd(path, shape)
+ 67 
+ 68 rows_all, errs, t0, n = [], 0, time.time(), 0
+ 69 for _, it in todo.iterrows():
+ 70     n += 1
+ 71     hh, common = grid[it["tile"]]
+ 72     if not common.any(): continue
+ 73     shape = common.shape
+ 74     try:
+ 75         f = rd(P(it["flood_extent"]), shape); e = rd(P(it["exclusion_mask"]), shape)
+ 76         wtr = refwater(P(it["reference_water"]), shape)
+ 77     except Exception as ex:
+ 78         errs += 1; print("  skip", it["id"], type(ex).__name__); continue
+ 79     obs = (f != 255) & (e == 0) & common
+ 80     variants = {"main": obs & (wtr != 1), "strict": obs & (wtr != 1) & (wtr != 2)}
+ 81     for vn, vv in variants.items():
+ 82         fv = (f == 1) & vv
+ 83         nv, nf = int(vv.sum()), int(fv.sum())
+ 84         for dem in ("raw", "corrected"):
+ 85             for t in TH:
+ 86                 p = (hh[dem] <= t) & vv
+ 87                 tp = int((p & fv).sum()); fp = int(p.sum()) - tp; fn = nf - tp
+ 88                 rows_all.append((it["id"], it["day"], it["tile"], it["flag"], vn, dem, t, tp, fp, fn, nv - tp - fp - fn, nv, nf))
+ 89     if n % 25 == 0 or n == len(todo):
+ 90         cols = ["id", "day", "tile", "flag", "variant", "dem", "t", "tp", "fp", "fn", "tn", "n_valid", "n_flood"]

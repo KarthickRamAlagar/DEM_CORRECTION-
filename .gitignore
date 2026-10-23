@@ -18,3 +18,11 @@ client/dist/
 # keep the model evidence (small files)
 !outputs/*.csv
 !outputs/*.json
+gateway/.env
+gateway/node_modules/
+mlflow/
+
+# evidence packs are rebuilt, installers are local
+evidence/
+sdg_apply*.py
+datasets_review.txt

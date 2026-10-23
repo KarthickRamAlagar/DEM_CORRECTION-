@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Mic, Send, Volume2, VolumeX, RotateCcw, Database, AlertCircle, Sparkles, Globe } from "lucide-react";
 import { suggestedQuestions, LANGUAGES } from "../data/mockAsk";
 import { askQuestion } from "../lib/askApi";
+import { guardAnswer } from "../lib/askGuard";
 import { playTingSound } from "../lib/notificationSound";
 import { speakText as speakWithSettings } from "../lib/speakText";
 
@@ -133,15 +134,17 @@ export default function AskYourDataPage() {
 
     try {
       const data = await askQuestion(q);
+      const guard = guardAnswer(data, q);
       setResult({
         question: q,
-        answer: data.answer,
+        answer: guard.answer,
         supportingData: data.results.length > 0
           ? Object.entries(data.results[0]).slice(0, 4).map(([label, value]) => ({ label, value: String(value) }))
           : [],
         source: `${data.sql} (via ${data.provider})`,
-        chartUrl: data.chart_url || null,
-        isFallback: false,
+        chartUrl: guard.ok ? (data.chart_url || null) : null,
+        isFallback: !guard.ok,
+        guardReason: guard.reason,
       });
     } catch (err) {
       setResult({
