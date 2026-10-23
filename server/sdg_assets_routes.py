@@ -63,7 +63,7 @@ def _one(k, R, P, B, rise):
         known = B[B[ha].notna() | B[hb].notna()]
         cut = known[_under(known[ha], rise) | _under(known[hb], rise)]
         out["bridges"] = {"total": int(len(B)), "with_river_height": int(len(known)), "approach_under_water": int(len(cut)),
-                          "names": [n for n in cut["name"].astype(str) if n][:8]}
+                          "names": [n for n in cut["name"].fillna("").astype(str) if n.strip() and n.lower() != "nan"][:8]}
     else:
         out["bridges"] = {"total": 0, "with_river_height": 0, "approach_under_water": 0, "names": []}
     for kind in KINDS:
