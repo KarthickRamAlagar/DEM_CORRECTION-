@@ -366,7 +366,7 @@ export default function GuidedFlow({ seed, meta, onExit }) {
           <>
             <div className="mt-6">
               <Figures items={[
-                { label: "Households exposed (estimate)", value: fmtRange(hh("households_min"), hh("households_max"), fmtInt), noData: hh("households_min") == null, sub: "India 5 to 6 persons per household (assumed, not verified). Nepal 4.37 (census 2021)" },
+                { label: "Households exposed (estimate)", value: fmtRange(hh("households_min"), hh("households_max"), fmtInt), noData: hh("households_min") == null, sub: "India: Census 2011 district range, see Assumptions. Nepal 4.37 (census 2021)" },
                 { label: "Cropland under water", value: `${fmtInt(c.cropland_ha)} ha`, sub: "Exposure, not crop loss" },
                 nutritionFigure(iso, focus),
               ]} />

@@ -145,7 +145,7 @@ export default function ChainTab({ initialPoint, technical, meta }) {
       {d && step === "house" && (
         <Section title="Households and hunger (SDG 2)" note="Households are people divided by household size. Land that grows food is the link to hunger.">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <StatCard label="Households exposed (est.)" value={fmtRange(hh("households_min"), hh("households_max"), fmtInt)} noData={hh("households_min") == null} sub="India 5 to 6 persons per household (assumed, not verified). Nepal 4.37 (national census 2021)." />
+            <StatCard label="Households exposed (est.)" value={fmtRange(hh("households_min"), hh("households_max"), fmtInt)} noData={hh("households_min") == null} sub="India: Census 2011 district range, see Assumptions. Nepal 4.37 (national census 2021)." />
             <StatCard label="Food-growing land exposed (ha)" value={fmtInt(c.cropland_ha)} sub="Cropland inside the flooded area. Exposure, not crop loss." />
             <StatCard label="Food insecurity, malnutrition" value={NO_DATA} noData sub="Needs a food-security or livelihoods dataset that has not been added. No number is made up." />
           </div>

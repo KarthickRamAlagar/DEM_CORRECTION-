@@ -173,7 +173,7 @@ export default function SdgPage() {
             <Section title="People and buildings in the observed flood footprint" note="WorldPop 2020 modelled population and VIDA building footprints. Exposure, not casualties or damage.">
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                 <StatCard label="People exposed" value={fmtInt(sel?.people_exposed)} sub={`${fmtPct(sel?.district_pop ? (100 * sel.people_exposed) / sel.district_pop : null)} of people in these districts`} />
-                <StatCard label="Households (est.)" value={fmtRange(sel?.households_min, sel?.households_max, fmtInt)} sub={isNepal ? "Household size 4.37 (national census 2021)" : "Household size 5 to 6 (assumed, not verified)"} />
+                <StatCard label="Households (est.)" value={fmtRange(sel?.households_min, sel?.households_max, fmtInt)} sub={isNepal ? "Household size 4.37 (national census 2021)" : "Household size: Census 2011 district range (see Assumptions)"} />
                 <StatCard label="Buildings exposed" value={fmtInt(sel?.buildings_exposed)} sub={sel?.buildings_exposed == null ? `Building footprints cover only ${sel?.buildings_districts_with_data ?? 0} of ${sel?.districts ?? 0} districts here, so no total is given.` : "Footprints, not damage. Cross-check only."} noData={sel?.buildings_exposed == null} />
                 <StatCard label="Housing ceiling" value={fmtMoney(sel?.housing_ceiling, cur)} sub="If every exposed household lost its house. Shown separately, never added to the need." />
               </div>

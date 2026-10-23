@@ -3,7 +3,7 @@
   "inr_to_npr": {"value": 1.60, "source": "Nepal Rastra Bank forex page, fixed rate 160 NPR per 100 INR, 21 Oct 2026", "status": "verified"},
   "IND": {
     "currency": "INR",
-    "household_size": {"low": 5.0, "high": 6.0, "status": "NOT verified: assumed range until Census 2011 table is read"},
+    "household_size": {"low": 5.83, "high": 6.93, "status": "Census 2011 table HH-01 (all households), district people per household: lowest and highest of 17 Uttar Pradesh districts with at least half their area in the analysis box. Data are 14 years old; household size has probably fallen since. Original table on censusindia.gov.in, file DDW-HH01-0900-2011.XLS"},
     "relief_cash_per_household": {"value": 5000, "what": "clothing 2,500 + utensils 2,500 per family", "source": "MHA letter F.No. 33-03/2020-NDM-1 (Vol-II) 10 Oct 2022, SDRF/NDRF 2022-23..2025-26", "status": "partly verified (page summary)"},
     "crop_per_ha": {"low": 8500, "high": 17000, "what": "input subsidy rainfed / assured irrigated, crop loss >=33%", "source": "same MHA letter", "status": "partly verified (page summary)"},
     "house_fully_damaged": {"value": 120000, "what": "fully damaged pucca house, plains", "source": "same MHA letter", "status": "partly verified (page summary)"}

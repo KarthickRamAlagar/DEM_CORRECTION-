@@ -120,7 +120,7 @@ export default function FuturePredictionTab({ onStartFlow }) {
       )}
 
       <div className="mt-6 max-w-[80ch] text-[13px] leading-relaxed text-ink-300">
-        <p><strong className="text-ink-100">What each part answers:</strong> the outlook says how likely flooding is in a typical coming year. The rainfall what-if shows dry, typical and wet seasons. The river forecast gives a day, date and year when river flow is expected to reach a flood level. The terrain what-if shows what a river rise would put under water. A physics flood model and a hill landslide screen are the next pilots.</p>
+        <p><strong className="text-ink-100">What each part answers:</strong> the outlook says how likely flooding is in a typical coming year. The rainfall what-if shows dry, typical and wet seasons. The river forecast gives a day, date and year when river flow is expected to reach a flood level. The terrain what-if shows what a river rise would put under water. A 2D physics flood model was tested against satellite floods and did not beat simple baselines, so it is not shown. A hill landslide screen, where shown, is not validated.</p>
         <p className="mt-2">The corrected elevation model is not claimed to improve flood prediction. Rows that show No data had no result from the server for that rise.</p>
       </div>
     </div>
