@@ -11,8 +11,8 @@
   "NPL": {
     "currency": "NPR",
     "household_size": {"low": 4.37, "high": 4.37, "status": "verified national average (census 2021 totals, calculated); Terai likely higher, not verified"},
-    "relief_cash_per_household": {"low": 15000, "high": 20000, "what": "immediate cash: 15,000 up to 5 members, 20,000 above 5", "source": "MoHA relief standard (7th amendment) 2077 BS, p2 clause 2(kha)", "status": "read by eye twice, no Nepali reader yet"},
+    "relief_cash_per_household": {"low": 15000, "high": 24000, "what": "immediate cash = 15 days of the minimum expenditure basket: Rs 200 per person per day, at least Rs 1,000 and at most Rs 1,600 per family per day, so 15,000 to 24,000", "source": "Disaster-sensitive Social Protection and Relief Distribution Standard 2081 BS (2025), clause 5(6) and 5(8) and Schedule 1 (printed pages 4 and 14); it repeals the 2077 standard", "status": "read from page images by the assistant, no Nepali reader has checked it"},
     "crop_per_ha": null,
-    "house_fully_damaged": {"value": 100000, "what": "new house at safe place, up to 1 lakh per family", "source": "MoHA standard 2077 BS, p3 clause 2(cha)", "status": "read by eye twice, no Nepali reader yet"}
+    "house_fully_damaged": {"value": 300000, "what": "permanent house grant for the Terai and inner Madhesh districts (hills 4 lakh, Himalayan 5 lakh); temporary shelter 50,000 in two parts; repair up to 1 lakh", "source": "same 2081 BS standard, clauses 6(c) and 7(1), printed page 5", "status": "read from page images by the assistant, no Nepali reader has checked it"}
   }
 }

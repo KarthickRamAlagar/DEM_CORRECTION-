@@ -35,7 +35,7 @@ LIMITATIONS = [
     "Population is a 2020 WorldPop modelled snapshot. Cropland is ESA WorldCover 2021 class 40 (no crop type or yield).",
     "Recovery need = relief cash per household + crop input subsidy per hectare (India only). Crop subsidy applies only where crop loss is 33% or more, so the crop line is a ceiling.",
     "Housing is shown separately as a ceiling (every exposed household loses its house) and is never added to the need.",
-    "India unit costs: 2022-26 values read from a state-department copy of the MHA letter of 10 Oct 2022 (partly verified). Nepal amounts were read by eye from a scanned 2077 BS standard and need a Nepali reader.",
+    "India unit costs: 2022-26 values read from a state-department copy of the MHA letter of 10 Oct 2022 (partly verified). Nepal amounts were read from page images of the 2081 BS (2025) relief standard, which replaces the 2077 one; no Nepali reader has checked them.",
     "Districts with less than 99% satellite coverage are left out of totals by default. Only the part of a district inside the study region is counted.",
     "This is a decision-support estimate of recovery need. It does not authorise any release of funds.",
 ]

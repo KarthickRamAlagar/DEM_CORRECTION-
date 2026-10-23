@@ -183,7 +183,7 @@ export default function ChainTab({ initialPoint, technical, meta }) {
             <StatCard label="Micro economics (per household)" value={mc.by_country[0] ? fmtRange(mc.by_country[0].relief_min / mc.by_country[0].households_min, mc.by_country[0].relief_max / mc.by_country[0].households_max, (v) => fmtAmount(v, mc.by_country[0].currency)) : NO_DATA} noData={!mc.by_country[0]} sub={`Relief cash per household (${mc.by_country[0]?.currency ?? ""}). Crop value at risk needs yield and price data not yet added.`} />
             <StatCard label="Macro economics" value={NO_DATA} noData sub="Needs district or state economic output (GDP) data, not yet added. Planned as a labelled scenario comparison." />
           </div>
-          <Tech on={technical}>Unit costs, sources and status are in the Assumptions tab. India crop subsidy applies only where crop loss is 33% or more, so it is a ceiling. Nepal has no documented crop rate in the 2077 standard, so Nepal crops are not included.</Tech>
+          <Tech on={technical}>Unit costs, sources and status are in the Assumptions tab. India crop subsidy applies only where crop loss is 33% or more, so it is a ceiling. Nepal has no documented crop rate in the 2081 standard, so Nepal crops are not included.</Tech>
         </Section>
       )}
 

@@ -159,7 +159,7 @@ export default function SdgPage() {
                   label="Crop input subsidy need"
                   value={isNepal ? NO_DATA : fmtRange(sel?.crop_min, sel?.crop_max, (v) => fmtMoney(v, cur))}
                   noData={isNepal}
-                  sub={isNepal ? "The Nepal 2077 standard has no crop rate. No number is made up." : "Ceiling: applies only where crop loss is 33% or more."}
+                  sub={isNepal ? "The Nepal 2081 standard has no crop rate. No number is made up." : "Ceiling: applies only where crop loss is 33% or more."}
                 />
               </div>
             </Section>
