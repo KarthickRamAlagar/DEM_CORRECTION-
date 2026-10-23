@@ -25,7 +25,7 @@ def rain_method():
 
 
 @router.get("/outlook/rain")
-def rain_outlook(country: str = "IND", bound: str = "upper_union", target: str = "people", limit: int = 15):
+def rain_outlook(country: str = "IND", bound: str = "upper_union", target: str = "people", limit: int = 15, district: str | None = None):
     if country not in ("IND", "NPL"):
         raise HTTPException(400, "country must be IND or NPL")
     if bound not in ("lower_unflagged", "upper_union"):
@@ -39,6 +39,8 @@ def rain_outlook(country: str = "IND", bound: str = "upper_union", target: str =
         raise HTTPException(404, "Rainfall model not built yet. Run: uv run python etl/forecast/build_rain_features.py, then etl/forecast/build_rain_model.py")
     d = pd.read_csv(p)
     d = d[(d["iso"] == country) & (d["bound"] == bound) & (d["target"] == target)]
+    if district:  # patch 22: one district, matched like the point outlook (trim + lower case)
+        d = d[d["district"].astype(str).str.strip().str.lower() == district.strip().lower()]
     rows = []
     for dist, g in d.groupby("district"):
         r = {"district": dist, "iso": country, "model": str(g["model"].iloc[0])}

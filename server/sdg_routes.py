@@ -216,3 +216,6 @@ router.include_router(_landslide_router)
 from .sdg_physics_routes import router as _physics_router  # noqa: E402
 
 router.include_router(_physics_router)
+from .sdg_assets_routes import router as _assets_router  # noqa: E402  (patch 22)
+
+router.include_router(_assets_router)

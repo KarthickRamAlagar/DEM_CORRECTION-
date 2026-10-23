@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { CircleCheck, CircleAlert, CircleHelp } from "lucide-react";
 import { fetchPointCheck, fmtInt, fmtRange, NO_DATA } from "../../lib/sdgApi";
 import { fetchPointOutlook } from "../../lib/pointOutlookApi";
+import RainScenarioCard from "./RainScenarioCard";
 import { Banner } from "./Ui";
 
 // Step 1 addition (patch 11): "Will it flood?" then "If it floods, what is the corrected ground here?".
@@ -26,7 +27,7 @@ function Fact({ label, value, sub }) {
   );
 }
 
-export default function PointOutlook({ point, seed, rise }) {
+export default function PointOutlook({ point, seed, rise, season, onSeason }) {
   const hasZ = !!seed && seed.rawZ != null && seed.correctedZ != null;
   const o = useQuery({ queryKey: ["pt-outlook", point?.lat, point?.lng], queryFn: () => fetchPointOutlook({ lat: point.lat, lon: point.lng }), enabled: !!point, retry: 0 });
   const pq = useQuery({
@@ -58,6 +59,8 @@ export default function PointOutlook({ point, seed, rise }) {
           </p>
         </div>
       )}
+
+      {d && d.here && onSeason && <RainScenarioCard here={d.here} season={season} onSeason={onSeason} />}
 
       <h3 className="mt-8 mb-3 text-[16px] font-semibold text-white">If it floods: the corrected ground at this point</h3>
       {!hasZ && d && (d.hand.raw != null || d.hand.corrected != null) && (

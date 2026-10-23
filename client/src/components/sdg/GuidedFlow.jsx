@@ -10,6 +10,8 @@ import EmptyState from "./EmptyState";
 import { NutritionPanel, EconPanels, CropPanel, nutritionFigure, econFigures, cropFigure } from "./ContextPanels";
 import MapTabs from "./MapTabs";
 import PointOutlook from "./PointOutlook";
+import AssetsCard from "./AssetsCard";
+import { seasonLabel } from "./RainScenarioCard";
 import ForecastBadge from "./ForecastBadge";
 import { forecastLabel } from "../../lib/dateFmt";
 import MapDescription from "./MapDescription";
@@ -153,6 +155,7 @@ export default function GuidedFlow({ seed, meta, onExit }) {
   const [reveal, setReveal] = useState(false);
   const [pdfBusy, setPdfBusy] = useState(false);
   const [revealSeen, setRevealSeen] = useState(false);
+  const [season, setSeason] = useState("typical"); // patch 22: dry / typical / wet rain what-if
 
   const q = useQuery({
     queryKey: ["flow-scn", point?.lat, point?.lng, radius, rise],
@@ -197,6 +200,7 @@ export default function GuidedFlow({ seed, meta, onExit }) {
   const summary = [
     ["Place", d?.here ? `${d.here.name} (${d.here.iso})` : point ? `${point.lat.toFixed(3)} N, ${point.lng.toFixed(3)} E` : NO_DATA],
     ["River rise", `${rise} m (what-if)`],
+    ["Rain season (what-if)", seasonLabel(season)],
     ["Circle", `${radius} km`],
     ["Raw elevation", seed?.rawZ != null ? m2(seed.rawZ) : NO_DATA],
     ["Corrected elevation", seed?.correctedZ != null ? m2(seed.correctedZ) : NO_DATA],
@@ -271,7 +275,7 @@ export default function GuidedFlow({ seed, meta, onExit }) {
               <MapTabs point={point} radiusKm={radius} onPick={setPoint} />
             )}
             <ForecastBadge seed={seed} />
-            <PointOutlook point={point} seed={seed} rise={rise} />
+            <PointOutlook point={point} seed={seed} rise={rise} season={season} onSeason={setSeason} />
             <h3 className="mt-8 mb-3 text-[16px] font-semibold text-white">Scenario settings</h3>
             <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
               <label className="flex items-center gap-3 text-[14px] text-ink-100">
@@ -356,6 +360,8 @@ export default function GuidedFlow({ seed, meta, onExit }) {
                   columns={[{ key: "n", label: "District", render: (x) => `${x.name} (${x.iso === "IND" ? "India" : "Nepal"})` }, { key: "p", label: "People exposed", align: "right", render: (x) => fmtInt(x.people) }]} />
               </>
             )}
+            <Heading>Roads, bridges, schools and health facilities</Heading>
+            <AssetsCard point={point} radius={radius} rise={rise} />
             <Heading>Buildings and people in 3D</Heading>
             <Lazy3D point={point} rise={rise} defaultLayer="buildings" seedRadius={Math.min(radius, 3)} />
             <Tech on={technical}>People: WorldPop 2020 constrained (modelled) times the flooded fraction of each cell. Buildings: VIDA footprints, shown only where they cover the whole circle. A 2020 snapshot is used for every scenario.</Tech>
