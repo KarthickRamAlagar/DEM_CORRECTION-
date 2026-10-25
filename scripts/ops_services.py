@@ -126,6 +126,9 @@ def cmd_render(cfg: dict) -> None:
     for job, key, def_port in (("postgres", "postgres_exporter", 9187), ("redis", "redis_exporter", 9121)):
         if key in cfg["services"]: extra.append(f'  - job_name: {job}\n    static_configs:\n      - targets: ["127.0.0.1:{cfg["services"][key].get("port", def_port)}"]')
     RENDERED.mkdir(parents=True, exist_ok=True); RUN.mkdir(parents=True, exist_ok=True)
+    for sub in ("grafana-data", "grafana-logs", "grafana-plugins"): (RUN / sub).mkdir(parents=True, exist_ok=True)  # Grafana does not create its own folders (patch 8c3)
+    nd = cfg["services"].get("nginx", {}).get("dir")
+    if nd and (Path(nd) / "conf" / "mime.types").exists(): shutil.copyfile(Path(nd) / "conf" / "mime.types", RENDERED / "mime.types")  # nginx.conf includes it from its own folder (patch 8c3)
     dist = cfg.get("client_dist", "")
     if dist:
         block = f'    location / {{ root "{Path(dist).as_posix()}"; try_files $uri /index.html; }}'
