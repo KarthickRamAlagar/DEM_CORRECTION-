@@ -19,9 +19,9 @@ export default function LandslideCard({ point, radiusKm = 10 }) {
   const c = d.slope.corrected, r = d.slope.raw, v = st.data?.validation, rain = d.rain, ok = v?.verdict?.slope_screen_supported;
   const hp = v?.hill_places;
   return (
-    <section className="mt-6 rounded-xl border border-ink-700 bg-ink-850/60 p-5" aria-label="Steep ground screening">
+    <section className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-md p-5" aria-label="Steep ground screening">
       <h3 className="text-[16px] font-semibold text-white">Steep ground near this place</h3>
-      <p className="mt-1 max-w-3xl text-[13.5px] leading-relaxed text-ink-200">
+      <p className="mt-1 max-w-3xl text-[13px] leading-relaxed text-ink-200">
         {pc(c.share_ge_15)} of the {radiusKm} km circle is steeper than 15°, and 5% of it is steeper than {dg(c.p95_deg)}. Steep ground can slide when heavy rain falls on it. This is a screening of slope and rain, not a landslide forecast.
       </p>
       <div className="mt-3 overflow-x-auto">
@@ -38,14 +38,14 @@ export default function LandslideCard({ point, radiusKm = 10 }) {
       {rain && !rain.available && <p className="mt-2 text-[13px] text-signal-amber">{rain.message}</p>}
       {rain?.available && (
         <div className="mt-3">
-          <p className="text-[14px] font-semibold text-white">{rain.text}</p>
+          <p className="text-[13px] font-semibold text-white">{rain.text}</p>
           <div className="mt-2 overflow-x-auto"><table className="w-full min-w-[520px] text-left text-[13px] tabular-nums">
             <thead className="text-ink-300"><tr><th className="py-1.5 pr-3 font-medium">Rain total over</th><th className="pr-3 font-medium">Rain that fell</th>{rain.thresholds.map((t) => <th key={t.id} className="pr-3 font-medium">{t.label}</th>)}</tr></thead>
             <tbody>{rain.thresholds[0].by_duration.map((row, i) => (
               <tr key={row.hours} className="border-t border-ink-700"><td className="py-1.5 pr-3">{row.hours / 24} {row.hours === 24 ? "day" : "days"}</td><td className="pr-3">{row.rain_mm == null ? "No data" : `${row.rain_mm} mm`}</td>
                 {rain.thresholds.map((t) => <td key={t.id} className="pr-3">{t.by_duration[i].threshold_mm} mm</td>)}</tr>))}
             </tbody></table></div>
-          <p className="mt-1 text-[12.5px] text-ink-400">{rain.note}</p>
+          <p className="mt-1 text-[13px] text-ink-400">{rain.note}</p>
         </div>)}
 
       <p className="mt-3 max-w-3xl text-[13px] leading-relaxed text-ink-300">
@@ -53,7 +53,7 @@ export default function LandslideCard({ point, radiusKm = 10 }) {
           ? `Checked against ${v.events_used} recorded landslides${v.event_years ? ` (${v.event_years[0]} to ${v.event_years[1]})` : ""}: steep ground separated them from random hill places (area under the curve ${hp?.auc_corrected?.toFixed(2)}, 95% range ${hp?.auc_corrected_ci95?.map((x) => x.toFixed(2)).join(" to ")}). The rain part was not checked.`
           : "Not checked against recorded landslides, or the check did not show a clear result. Treat this as unvalidated."}
       </p>
-      <ul className="mt-2 list-disc space-y-0.5 pl-5 text-[12.5px] text-ink-400">{(d.caveats || []).map((t) => <li key={t}>{t}</li>)}</ul>
+      <ul className="mt-2 list-disc space-y-0.5 pl-5 text-[13px] text-ink-400">{(d.caveats || []).map((t) => <li key={t}>{t}</li>)}</ul>
     </section>
   );
 }

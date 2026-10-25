@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, Check, Download, Lock } from "lucide-react";
 import { fetchScenario, fetchPointCheck, fetchCropContext, fetchAdmin1, fetchScene, fetchRegionMaps, fmtInt, fmtMoney, fmtRange, fmtPct, NO_DATA } from "../../lib/sdgApi";
@@ -20,7 +20,7 @@ import RegionFloodMaps from "./RegionFloodMaps";
 import { Curve } from "./ChainTab";
 
 const View3D = lazy(() => import("./View3D"));
-const Lazy3D = (props) => (<Suspense fallback={<p className="mt-4 text-[14px] text-ink-300">Loading the 3D view...</p>}><View3D {...props} /></Suspense>);
+const Lazy3D = (props) => (<Suspense fallback={<p className="mt-4 text-[13px] text-ink-300">Loading the 3D view...</p>}><View3D {...props} /></Suspense>);
 
 const RADII = [{ id: 5, label: "5 km" }, { id: 10, label: "10 km" }, { id: 20, label: "20 km" }];
 const LAST = FLOW_STEPS.length - 1;
@@ -29,8 +29,8 @@ const fmtAmount = (v, cur) => `${cur === "NPR" ? "NPR " : "₹"}${Math.round(v).
 const DOT = { flooded: "#2563eb", dry: "#64748b", uncertain: "#f59e0b" };
 const kindOf = (s) => (s.startsWith("flooded") ? "flooded" : s.startsWith("dry") ? "dry" : "uncertain");
 
-const btnPrimary = "inline-flex items-center gap-2 rounded-lg border border-signal-teal/60 bg-signal-teal/15 px-5 py-2.5 text-[14px] font-semibold text-signal-teal hover:bg-signal-teal/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-signal-teal disabled:opacity-40 disabled:cursor-not-allowed";
-const btnQuiet = "inline-flex items-center gap-2 rounded-lg border border-ink-600 px-4 py-2.5 text-[14px] font-medium text-ink-100 hover:text-white hover:border-ink-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-signal-teal disabled:opacity-40 disabled:cursor-not-allowed";
+const btnPrimary = "inline-flex items-center gap-2 rounded-lg border border-signal-teal/60 bg-signal-teal/15 px-5 py-2.5 text-[13px] font-semibold text-signal-teal hover:bg-signal-teal/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-signal-teal disabled:opacity-40 disabled:cursor-not-allowed";
+const btnQuiet = "inline-flex items-center gap-2 rounded-lg border border-ink-600 px-4 py-2.5 text-[13px] font-medium text-ink-100 hover:text-white hover:border-ink-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-signal-teal disabled:opacity-40 disabled:cursor-not-allowed";
 
 const Tech = ({ on, children }) => (on ? <div className="mt-5 rounded-lg border border-ink-700/60 bg-ink-850/60 p-4 text-[13px] leading-relaxed text-ink-200 max-w-3xl">{children}</div> : null);
 const Heading = ({ children }) => <h3 className="mt-8 mb-3 text-[16px] font-semibold text-white">{children}</h3>;
@@ -48,7 +48,7 @@ function PointCard({ pq, seed, rise }) {
   if (!seed || seed.rawZ == null || seed.correctedZ == null) return null;
   if (pq.isError) return <div className="mt-8"><Banner tone="amber">Point check: {pq.error.message}</Banner></div>;
   const p = pq.data;
-  if (!p) return <p className="mt-8 text-[13.5px] text-ink-300">Checking the point...</p>;
+  if (!p) return <p className="mt-8 text-[13px] text-ink-300">Checking the point...</p>;
   const a = p.adjusted;
   return (
     <div>
@@ -60,7 +60,7 @@ function PointCard({ pq, seed, rise }) {
           <Fact label="Height above the nearest river" value={a ? (a.has_interval ? `${m2(a.low)} to ${m2(a.high)}` : m2(a.mid)) : NO_DATA} />
           <Fact label={`If the river rises ${rise} m`} value={p.status ?? NO_DATA} />
         </dl>
-        {p.message && <p className="mt-4 text-[13.5px] text-signal-amber">{p.message}</p>}
+        {p.message && <p className="mt-4 text-[13px] text-signal-amber">{p.message}</p>}
         {p.by_rise.length > 0 && (
           <ul className="mt-5 flex flex-wrap gap-2 list-none p-0">
             {p.by_rise.map((r) => (
@@ -96,12 +96,12 @@ function Sidebar({ idx, maxIdx, started, locked, onGo, onCancel, confirmCancel, 
               <li key={s.id} className="relative">
                 <button type="button" onClick={() => onGo(i)} disabled={disabled} aria-current={i === idx ? "step" : undefined}
                   className={`group flex w-full items-start gap-3 rounded-lg px-1 py-2 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-signal-teal ${disabled ? "cursor-default" : "hover:bg-ink-850/70"}`}>
-                  <span className={`relative z-10 mt-0.5 flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full border text-[12px] font-semibold ${
+                  <span className={`relative z-10 mt-0.5 flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full border text-[13px] font-semibold ${
                     state === "current" ? "border-signal-teal bg-signal-teal text-ink-950" : state === "done" ? "border-signal-teal/70 bg-ink-900 text-signal-teal" : "border-ink-600 bg-ink-900 text-ink-300"}`}>
                     {state === "done" ? <Check size={13} /> : i + 1}
                   </span>
                   <span className="min-w-0">
-                    <span className={`block text-[14px] leading-snug ${state === "current" ? "font-semibold text-white" : state === "done" ? "text-ink-100" : "text-ink-300"}`}>{s.title}</span>
+                    <span className={`block text-[13px] leading-snug ${state === "current" ? "font-semibold text-white" : state === "done" ? "text-ink-100" : "text-ink-300"}`}>{s.title}</span>
                     {s.sdg && <span className="mt-0.5 block"><SdgChip goal={s.sdg} /></span>}
                   </span>
                 </button>
@@ -124,7 +124,7 @@ function Sidebar({ idx, maxIdx, started, locked, onGo, onCancel, confirmCancel, 
 
       <div className="mt-4">
         {!confirmCancel ? (
-          <button type="button" onClick={() => (locked && idx < LAST ? setConfirmCancel(true) : onExit())} className="text-[13.5px] text-ink-300 underline underline-offset-4 hover:text-white">
+          <button type="button" onClick={() => (locked && idx < LAST ? setConfirmCancel(true) : onExit())} className="text-[13px] text-ink-300 underline underline-offset-4 hover:text-white">
             {locked && idx < LAST ? "Cancel this flow" : "Return to the SDG guide"}
           </button>
         ) : (
@@ -186,15 +186,22 @@ export default function GuidedFlow({ seed, meta, onExit }) {
   };
   const back = () => go(idx - 1);
 
-  // warn before closing the tab mid-flow
-  useEffect(() => {
-    if (!(started && idx < LAST)) return undefined;
-    const h = (e) => { e.preventDefault(); e.returnValue = ""; };
-    window.addEventListener("beforeunload", h);
-    return () => window.removeEventListener("beforeunload", h);
-  }, [started, idx]);
-
   useEffect(() => { if (started && idx === 5 && d && !blocked && mc?.by_country?.length && !revealSeen) { setReveal(true); setRevealSeen(true); } }, [started, idx, d, blocked, revealSeen]); // eslint-disable-line react-hooks/exhaustive-deps
+  // patch 23: fetch the scene, the region maps and the stored evaluation in the background once the last two steps are reached,
+  // so the PDF button only has to build the file (a fraction of a second) instead of waiting for the network.
+  const prepRef = useRef(null);
+  const prepFor = () => {
+    const key = `${point?.lat},${point?.lng},${radius},${rise},${iso}`;
+    if (prepRef.current?.key !== key) {
+      prepRef.current = { key, promise: Promise.all([
+        fetchScene({ lat: point.lat, lon: point.lng, radius_km: Math.min(3, radius), rise_m: rise }).catch(() => null),
+        fetchRegionMaps({ rise_m: rise, country: iso === "IND" ? "IND" : "NPL" }).catch(() => null),
+        loadEvalData().catch(() => ({ e: null, spatial: null })),
+      ]) };
+    }
+    return prepRef.current.promise;
+  };
+  useEffect(() => { if (started && idx >= LAST - 1 && d && point && !blocked) prepFor(); }, [started, idx, d, point, radius, rise, iso]); // eslint-disable-line react-hooks/exhaustive-deps
   const step = FLOW_STEPS[idx];
   const nextStep = FLOW_STEPS[Math.min(idx + 1, LAST)];
   const summary = [
@@ -278,14 +285,14 @@ export default function GuidedFlow({ seed, meta, onExit }) {
             <PointOutlook point={point} seed={seed} rise={rise} season={season} onSeason={setSeason} />
             <h3 className="mt-8 mb-3 text-[16px] font-semibold text-white">Scenario settings</h3>
             <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-              <label className="flex items-center gap-3 text-[14px] text-ink-100">
+              <label className="flex items-center gap-3 text-[13px] text-ink-100">
                 River rises by
                 <input type="range" min="0.5" max="8" step="0.5" value={rise} onChange={(e) => setRise(Number(e.target.value))} />
                 <span className="w-14 text-white tabular-nums">{rise} m</span>
               </label>
-              <div className="flex items-center gap-3 text-[14px] text-ink-100">Circle around the place <Segmented label="Circle size" options={RADII} value={radius} onChange={setRadius} /></div>
+              <div className="flex items-center gap-3 text-[13px] text-ink-100">Circle around the place <Segmented label="Circle size" options={RADII} value={radius} onChange={setRadius} /></div>
             </div>
-            <p className="mt-3 max-w-2xl text-[13.5px] leading-relaxed text-ink-300">The DEM engine does not predict a river rise, so this is a setting you choose (default 2 m). Both settings lock when you start.</p>
+            <p className="mt-3 max-w-2xl text-[13px] leading-relaxed text-ink-300">The DEM engine does not predict a river rise, so this is a setting you choose (default 2 m). Both settings lock when you start.</p>
           </div>
         )}
 
@@ -313,7 +320,7 @@ export default function GuidedFlow({ seed, meta, onExit }) {
               {floodTab === "maps" && (
                 <>
                   <Heading>How the correction changes the flood map</Heading>
-                  <p className="mb-4 max-w-3xl text-[14px] leading-relaxed text-ink-200">The same river rise, run on the raw elevation model and on the corrected one, across the Nepal Terai and the Indian plains beside it. The maps show where the correction moves the water line.</p>
+                  <p className="mb-4 max-w-3xl text-[13px] leading-relaxed text-ink-200">The same river rise, run on the raw elevation model and on the corrected one, across the southern plains of Nepal and the Indian plains beside it. The maps show where the correction moves the water line.</p>
                   <RegionFloodMaps point={point} radiusKm={radius} defaultRise={rise} defaultCountry={d.here?.iso === "IND" ? "IND" : "NPL"} />
                   <Heading>Around your place</Heading>
                   <MapTabs point={point} radiusKm={radius} overlay={d.overlay} />
@@ -323,11 +330,11 @@ export default function GuidedFlow({ seed, meta, onExit }) {
               {floodTab === "view3d" && (
                 <>
                   <Heading>See the flood in 3D</Heading>
-                  <p className="max-w-3xl text-[14px] leading-relaxed text-ink-200">Buildings, people and crops on the terrain, with the same river rise run on the raw and the corrected elevation model. Use Compare to see where the two disagree.</p>
+                  <p className="max-w-3xl text-[13px] leading-relaxed text-ink-200">Buildings, people and crops on the terrain, with the same river rise run on the raw and the corrected elevation model. Use Compare to see where the two disagree.</p>
                   <Lazy3D point={point} rise={rise} seedRadius={Math.min(radius, 3)} />
                 </>
               )}
-              {floodTab === "point" && (hasZ ? <PointCard pq={pq} seed={seed} rise={rise} /> : <p className="mt-8 max-w-2xl text-[14px] leading-relaxed text-ink-200">This run did not start from a DEM engine result, so there is no corrected elevation to check against the river. Start from New Inputs to see the point check.</p>)}
+              {floodTab === "point" && (hasZ ? <PointCard pq={pq} seed={seed} rise={rise} /> : <p className="mt-8 max-w-2xl text-[13px] leading-relaxed text-ink-200">This run did not start from a DEM engine result, so there is no corrected elevation to check against the river. Start from New Inputs to see the point check.</p>)}
               {floodTab === "graphs" && (
                 <>
                   <Heading>How the numbers grow as the river rises</Heading>
@@ -352,7 +359,7 @@ export default function GuidedFlow({ seed, meta, onExit }) {
                 { label: "Buildings exposed", value: fmtInt(c.buildings), noData: c.buildings == null, sub: c.buildings == null ? "Footprints do not cover the whole circle, so no total is given" : "Footprints, not damage" },
               ]} />
             </div>
-            <p className="mt-4 text-[14px] text-ink-200">Seen flooded by satellite in the circle: {fmtRange(d.observed.lower.people, d.observed.upper.people, fmtInt)} people in at least one year from 2019 to 2026 (conservative to upper).</p>
+            <p className="mt-4 text-[13px] text-ink-200">Seen flooded by satellite in the circle: {fmtRange(d.observed.lower.people, d.observed.upper.people, fmtInt)} people in at least one year from 2019 to 2026 (conservative to upper).</p>
             {d.districts.length > 0 && (
               <>
                 <Heading>Districts touched</Heading>
@@ -404,7 +411,7 @@ export default function GuidedFlow({ seed, meta, onExit }) {
         {reveal && mc?.by_country?.length > 0 && <AmountReveal countries={mc.by_country} totalInr={{ min: mc.need_min_inr, max: mc.need_max_inr }} onClose={() => setReveal(false)} />}
         {!blocked && idx === 5 && d && (
           <>
-            {mc?.by_country?.length > 0 && <div className="mt-4"><button type="button" onClick={() => setReveal(true)} className="rounded-lg border border-ink-600 px-3.5 py-2 text-[13.5px] font-medium text-ink-100 hover:text-white">Show the amount again</button></div>}
+            {mc?.by_country?.length > 0 && <div className="mt-4"><button type="button" onClick={() => setReveal(true)} className="rounded-lg border border-ink-600 px-3.5 py-2 text-[13px] font-medium text-ink-100 hover:text-white">Show the amount again</button></div>}
             <div className="mt-6">
               <Figures items={[
                 { label: "Need, corrected DEM (INR)", value: fmtRange(mc.need_min_inr, mc.need_max_inr, (v) => fmtMoney(v, "INR")), noData: mc.need_min_inr == null, sub: "Lowest to highest over the unit-cost ranges" },
@@ -442,13 +449,13 @@ export default function GuidedFlow({ seed, meta, onExit }) {
                         { key: "ni", label: "Need, INR", align: "right", render: (x) => fmtRange(x.need_min_inr, x.need_max_inr, (v) => fmtMoney(v, "INR")) },
                       ]} />
                     <Heading>How the amount is worked out</Heading>
-                    <div className="rounded-lg border border-ink-700/60 bg-ink-850/60 p-4 text-[13.5px] leading-relaxed text-ink-100 max-w-3xl space-y-2">
+                    <div className="rounded-lg border border-ink-700/60 bg-ink-850/60 p-4 text-[13px] leading-relaxed text-ink-100 max-w-3xl space-y-2">
                       <p><span className="font-medium text-white">Households</span> = people under water divided by household size.</p>
                       <p><span className="font-medium text-white">Need</span> = households times relief cash per household, plus cropland hectares under water times the crop input subsidy (India only).</p>
                       <p><span className="font-medium text-white">Housing</span> is a separate ceiling and is not added to the need.</p>
                       <p><span className="font-medium text-white">Corrected against raw:</span> the same scenario on the raw DEM needs {fmtRange(mr.need_min_inr, mr.need_max_inr, (v) => fmtMoney(v, "INR"))}, so the gap shows how much the correction changes the amount.</p>
                     </div>
-                    <Heading>Unit costs and their status</Heading>
+                    <Heading>Unit costs and sources</Heading>
                     <DataTable caption="Unit costs used and how well sourced each one is" rows={mc.by_country} rowKey={(x) => x.iso}
                       columns={[
                         { key: "c", label: "Country", render: (x) => (x.iso === "IND" ? "India" : "Nepal") },
@@ -457,8 +464,8 @@ export default function GuidedFlow({ seed, meta, onExit }) {
                         { key: "cr", label: "Crop subsidy", render: (x) => x.status.crop },
                       ]} />
                     {meta?.assumptions && (
-                      <ul className="mt-3 space-y-1.5 text-[13.5px] text-ink-200 max-w-3xl list-none p-0">
-                        <li>Exchange rate: 1 INR = {meta.assumptions.inr_to_npr?.value} NPR. Status: {meta.assumptions.inr_to_npr?.status}.</li>
+                      <ul className="mt-3 space-y-1.5 text-[13px] text-ink-200 max-w-3xl list-none p-0">
+                        <li>Exchange rate: 1 INR = {meta.assumptions.inr_to_npr?.value} NPR. Source: {meta.assumptions.inr_to_npr?.status}.</li>
                         {["IND", "NPL"].map((k) => { const a = meta.assumptions[k]; if (!a) return null; const hs = a.household_size, rc = a.relief_cash_per_household;
                           return <li key={k}>{k === "IND" ? "India" : "Nepal"}: household size {hs.low === hs.high ? hs.low : `${hs.low} to ${hs.high}`} ({hs.status}); relief cash per household {rc.value ?? `${rc.low} to ${rc.high}`} {a.currency} ({rc.status}).</li>; })}
                       </ul>
@@ -479,17 +486,13 @@ export default function GuidedFlow({ seed, meta, onExit }) {
 
         {!blocked && idx === LAST && (
           <div className="mt-6 max-w-2xl">
-            <p className="text-[14px] leading-relaxed text-ink-200">The PDF takes you from {fromDem ? "your DEM engine result" : seed?.forecast ? "the river forecast day you chose" : "the place you chose"} through the flood scenario, people and buildings, land and crops, to the micro and macro economics, then the model evaluation, with the method notes and developer footer on the last page.</p>
+            <p className="text-[13px] leading-relaxed text-ink-200">The PDF takes you from {fromDem ? "your DEM engine result" : seed?.forecast ? "the river forecast day you chose" : "the place you chose"} through the flood scenario, people and buildings, land and crops, to the micro and macro economics, then the model evaluation, with the method notes and developer footer on the last page.</p>
             <div className="mt-5">
               {d ? (
                 <button type="button" onClick={async () => {
                   setPdfBusy(true);
                   try {
-                    const [scene, region] = await Promise.all([
-                      fetchScene({ lat: point.lat, lon: point.lng, radius_km: Math.min(3, radius), rise_m: rise }).catch(() => null),
-                      fetchRegionMaps({ rise_m: rise, country: iso === "IND" ? "IND" : "NPL" }).catch(() => null),
-                    ]);
-                    const evalData = await loadEvalData();
+                    const [scene, region, evalData] = await prepFor();
                     const doc = await buildPlaceReport({ data: d, meta, scene, region, evalData,
                       dem: seed ? { lat: seed.lat, lng: seed.lng, rawZ: seed.rawZ, correctedZ: seed.correctedZ, zLo: seed.zLo, zHi: seed.zHi, date: seed.date, inputs: seed.inputs, engine: seed.engine, forecast: seed.forecast ? { label: forecastLabel(seed.forecast) } : null } : null,
                       extra: { nutrition: nutritionFigure(iso, focus), crop: cropFigure(iso, cropQ.data, c.cropland_ha), econ: econFigures(iso, focus) } });
@@ -500,7 +503,7 @@ export default function GuidedFlow({ seed, meta, onExit }) {
                 </button>
               ) : <Banner tone="amber">There is no result to put in a report.</Banner>}
             </div>
-            <p className="mt-4 text-[13.5px] text-ink-300">The whole-region DEM Correction Report and SDG Report come next.</p>
+            <p className="mt-4 text-[13px] text-ink-300">The whole-region DEM Correction Report and SDG Report come next.</p>
           </div>
         )}
 

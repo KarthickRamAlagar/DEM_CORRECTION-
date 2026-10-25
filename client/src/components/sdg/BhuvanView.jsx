@@ -24,9 +24,9 @@ export default function BhuvanView({ point, radiusKm, onPick }) {
 
   return (
     <div>
-      <div className="mb-2 flex flex-wrap items-center gap-3 text-[12px] text-ink-300">
+      <div className="mb-2 flex flex-wrap items-center gap-3 text-[13px] text-ink-300">
         <select value={id} onChange={(e) => { setId(e.target.value); setErrors(0); setLegendOk(true); }}
-          className="rounded-lg border border-ink-700/70 bg-ink-900/60 px-2.5 py-1.5 text-[12px] text-ink-100 max-w-full">
+          className="rounded-lg border border-ink-700/70 bg-ink-900/60 px-2.5 py-1.5 text-[13px] text-ink-100 max-w-full">
           {BHUVAN_LAYERS.map((x) => <option key={x.id} value={x.id}>{x.label}{x.tested ? "" : " (not yet tested)"}</option>)}
         </select>
         <label className="flex items-center gap-1.5"><input type="checkbox" checked={on} onChange={(e) => setOn(e.target.checked)} /> Show layer</label>
@@ -54,7 +54,7 @@ export default function BhuvanView({ point, radiusKm, onPick }) {
       </div>
       <div className="mt-2 space-y-1.5">
         {errors >= 3 && <Banner tone="amber">Bhuvan did not return map tiles for this layer here. The layer may not cover this area, or the service is slow or down. The rest of the app is not affected.</Banner>}
-        <p className="text-[11px] text-ink-400">
+        <p className="text-[12px] text-ink-400">
           Context layer from ISRO Bhuvan. India only: no Bhuvan layers cover Nepal. It shows land cover, not flood extent or our corrected DEM.
           {L.tested ? " This layer returned a real map image in a test on 21 Oct 2026." : " This layer has not been tested yet and may show nothing."}
           {" "}Bhuvan's terms of use were not stated on the page checked; confirm them before public release.

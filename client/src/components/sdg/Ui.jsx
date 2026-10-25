@@ -3,13 +3,37 @@ import { Info } from "lucide-react";
 // Shared building blocks for the SDG pages. Colours come from the app's own tokens so every theme works.
 // Text scale: body 14, secondary 13, never below 12. Labels are sentence case; figures use tabular numerals.
 
+// Glass look shared by the SDG pages: a soft translucent panel with a thin light edge.
+export const GLASS = "rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-md shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]";
+// Region wording: "Terai" is replaced by plain words wherever text from the server or the data files is shown.
+export const plainText = (t) => String(t ?? "").replace(/Nepal(?:'s)? Terai(?: lowlands)?/g, "the southern plains of Nepal").replace(/\bTerai\b/g, "southern plains");
+// Bento grid: 12 columns on a wide screen, 6 on a medium one, 1 on a narrow one. Give each card a span class such as "lg:col-span-4".
+export function Bento({ children, className = "" }) {
+  return <div className={`grid grid-cols-1 gap-3 md:grid-cols-6 lg:grid-cols-12 ${className}`}>{children}</div>;
+}
+export function BentoCard({ title, value, sub, children, className = "", action }) {
+  return (
+    <div className={`${GLASS} p-4 min-w-0 ${className}`}>
+      {(title || action) && (
+        <div className="flex items-start justify-between gap-3">
+          {title && <div className="text-[13px] font-medium text-ink-200">{title}</div>}
+          {action}
+        </div>
+      )}
+      {value != null && <div className="mt-1.5 text-[22px] font-semibold leading-tight tabular-nums text-white">{value}</div>}
+      {sub && <div className="mt-1.5 text-[13px] leading-snug text-ink-300">{sub}</div>}
+      {children}
+    </div>
+  );
+}
+
 export function Banner({ children, tone = "teal" }) {
   const tones = {
     teal: "border-signal-teal/70 text-ink-100",
     amber: "border-signal-amber/80 text-ink-100",
   };
   return (
-    <div className={`flex items-start gap-2.5 rounded-r-lg border-l-[3px] bg-ink-850/70 px-3.5 py-2.5 text-[13.5px] leading-relaxed ${tones[tone]}`}>
+    <div className={`flex items-start gap-2.5 rounded-r-lg border-l-[3px] bg-ink-850/70 px-3.5 py-2.5 text-[13px] leading-relaxed ${tones[tone]}`}>
       <Info size={15} className={`mt-[3px] shrink-0 ${tone === "amber" ? "text-signal-amber" : "text-signal-teal"}`} />
       <div>{children}</div>
     </div>
@@ -36,12 +60,12 @@ export function Segmented({ options, value, onChange, label }) {
   );
 }
 
-export function StatCard({ label, value, sub, noData }) {
+export function StatCard({ label, value, sub, noData, active }) {
   return (
-    <div className="rounded-xl border border-ink-700/60 bg-ink-900/50 p-4 min-w-0">
+    <div className={`${GLASS} p-4 min-w-0 ${active ? "ring-1 ring-signal-teal/70" : ""}`}>
       <div className="text-[13px] text-ink-200">{label}</div>
       <div className={`mt-1.5 text-[24px] leading-8 font-semibold tabular-nums ${noData ? "text-ink-300 text-[18px]" : "text-white"}`}>{value}</div>
-      {sub && <div className="mt-1.5 text-[12.5px] text-ink-300 leading-snug">{sub}</div>}
+      {sub && <div className="mt-1.5 text-[13px] text-ink-300 leading-snug">{sub}</div>}
     </div>
   );
 }
@@ -55,7 +79,7 @@ export function Figures({ items }) {
         <div key={it.label} className="px-5 py-4 min-w-0">
           <div className="text-[13px] text-ink-200">{it.label}</div>
           <div className={`mt-1 font-semibold tabular-nums leading-tight ${it.noData ? "text-[18px] text-ink-300" : String(it.value).length > 16 ? "text-[21px] text-white" : "text-[26px] text-white"}`}>{it.value}</div>
-          {it.sub && <div className="mt-1.5 text-[12.5px] leading-snug text-ink-300">{it.sub}</div>}
+          {it.sub && <div className="mt-1.5 text-[13px] leading-snug text-ink-300">{it.sub}</div>}
         </div>
       ))}
     </div>
@@ -76,7 +100,7 @@ export function Section({ title, children, note }) {
 export function DataTable({ columns, rows, rowKey, caption, highlight }) {
   return (
     <div className="overflow-x-auto rounded-xl border border-ink-700/60">
-      <table className="w-full text-[13.5px]">
+      <table className="w-full text-[13px]">
         {caption && <caption className="sr-only">{caption}</caption>}
         <thead>
           <tr className="bg-ink-850/80">
@@ -123,10 +147,10 @@ export function Tabs({ tabs, value, onChange, label }) {
     onChange(tabs[(n + tabs.length) % tabs.length].id);
   };
   return (
-    <div role="tablist" aria-label={label} onKeyDown={onKey} className="flex flex-wrap gap-1 border-b border-ink-700/60">
+    <div role="tablist" aria-label={label} onKeyDown={onKey} className="flex flex-nowrap gap-1 overflow-x-auto border-b border-ink-700/60">
       {tabs.map((t) => (
         <button key={t.id} id={`tab-${t.id}`} role="tab" type="button" aria-selected={value === t.id} tabIndex={value === t.id ? 0 : -1} onClick={() => onChange(t.id)}
-          className={`-mb-px border-b-2 px-4 py-2.5 text-[14px] font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-signal-teal ${value === t.id ? "border-signal-teal text-white" : "border-transparent text-ink-200 hover:text-white"}`}>
+          className={`-mb-px shrink-0 whitespace-nowrap border-b-2 px-3 py-2.5 text-[13px] font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-signal-teal ${value === t.id ? "border-signal-teal text-white" : "border-transparent text-ink-200 hover:text-white"}`}>
           {t.label}
         </button>
       ))}

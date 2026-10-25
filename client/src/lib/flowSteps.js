@@ -6,7 +6,7 @@ export const FLOW_STEPS = [
     what: "The place and the corrected elevation from the DEM engine, or a place you choose on the map.",
     you: "Check the values and choose how far the river rises. Press Start." },
   { id: "flood", icon: Waves, title: "Flood what-if", sdg: null,
-    what: "Raw and corrected DEM flood maps for the Nepal Terai and nearby India, the land under water at your place, and floods the satellite saw 2019-2026.",
+    what: "Raw and corrected DEM flood maps for the southern plains of Nepal and nearby India, the land under water at your place, and floods the satellite saw 2019-2026.",
     you: "Compare the raw and corrected flood maps, then press Next." },
   { id: "sdg11", icon: Building2, title: "Communities at risk", sdg: "SDG 11",
     what: "People, built-up land and buildings inside the flooded area, and the districts touched.",

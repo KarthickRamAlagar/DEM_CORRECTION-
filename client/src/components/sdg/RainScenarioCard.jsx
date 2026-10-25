@@ -35,8 +35,8 @@ export default function RainScenarioCard({ here, season, onSeason }) {
       <div className="rounded-xl border border-ink-700/60 bg-ink-900/50 p-5">
         <Banner tone="amber"><strong>A what-if on rain, not a rainfall forecast.</strong> It asks: if this season's rain is like the drier, middle or wetter third of the seasons seen in 2019 to 2025, how many people in this district would be exposed to flooding? It does not change the river rise you choose below, and counts are exposure, not casualties.</Banner>
         <div className="mt-4"><Segmented label="Rain season" options={SEASONS} value={season} onChange={onSeason} /></div>
-        {loading && <p className="mt-3 text-[13.5px] text-ink-300">Loading the rain what-if...</p>}
-        {m.isError && <p className="mt-3 text-[13.5px] text-ink-300">{NO_DATA}: {m.error.message}</p>}
+        {loading && <p className="mt-3 text-[13px] text-ink-300">Loading the rain what-if...</p>}
+        {m.isError && <p className="mt-3 text-[13px] text-ink-300">{NO_DATA}: {m.error.message}</p>}
         {!loading && !m.isError && (
           <dl className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
             {BOUNDS.map((b) => {
@@ -45,7 +45,7 @@ export default function RainScenarioCard({ here, season, onSeason }) {
                 <div key={b.id} className="min-w-0">
                   <dt className="text-[13px] text-ink-300">{b.label}, {seasonLabel(season).toLowerCase()}</dt>
                   <dd className="mt-0.5 text-[20px] font-semibold text-white tabular-nums">{!used(b.id) ? NO_DATA : r ? fmtRange(r.p10, r.p90, fmtInt) : NO_DATA}</dd>
-                  <dd className="mt-0.5 text-[12.5px] text-ink-400">
+                  <dd className="mt-0.5 text-[13px] text-ink-400">
                     {!sum(b.id) ? "Model summary not available" : !used(b.id) ? "Rain did not beat plain history on unseen years, so no rain-based number is shown" : r ? `People, middle ${fmtInt(r.p50)}` : "This district has no rain-model row (no rainfall cell or partial satellite coverage)"}
                   </dd>
                 </div>
@@ -54,7 +54,7 @@ export default function RainScenarioCard({ here, season, onSeason }) {
           </dl>
         )}
         {!loading && !m.isError && !any && <p className="mt-3 max-w-3xl text-[13px] leading-relaxed text-ink-300">The plain district outlook above stays the answer for this place.</p>}
-        <p className="mt-3 max-w-3xl text-[12.5px] leading-relaxed text-ink-400">Chosen season: {seasonLabel(season)}. It is kept with this run and shown in the summary. Range = 10th to 90th percentile of the model.</p>
+        <p className="mt-3 max-w-3xl text-[13px] leading-relaxed text-ink-400">Chosen season: {seasonLabel(season)}. It is kept with this run and shown in the summary. Range = 10th to 90th percentile of the model.</p>
       </div>
     </div>
   );

@@ -25,10 +25,10 @@ export default function DistrictTable({ rows, kind }) {
   // district names can repeat (two "Bara", two "Saptari" in the Nepal boundary file): show the area to tell them apart
   const counts = {};
   (rows ?? []).forEach((r) => { counts[r.district] = (counts[r.district] ?? 0) + 1; });
-  if (!rows?.length) return <div className="text-sm text-ink-400">{NO_DATA}</div>;
+  if (!rows?.length) return <div className="text-[13px] text-ink-400">{NO_DATA}</div>;
   return (
     <div className="overflow-x-auto rounded-xl border border-ink-700/60">
-      <table className="w-full text-[13.5px]">
+      <table className="w-full text-[13px]">
         <thead className="bg-ink-850/80 text-ink-200">
           <tr>
             <th className="text-left text-[13px] font-medium px-4 py-3">District</th>

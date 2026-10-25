@@ -50,7 +50,7 @@ export default function AppleMapView({ point, radiusKm }) {
 
   if (err) {
     return (
-      <div className="rounded-xl border border-signal-amber/40 bg-signal-amber/10 p-4 text-[12px] text-signal-amber" style={{ minHeight: 140 }}>
+      <div className="rounded-xl border border-signal-amber/40 bg-signal-amber/10 p-4 text-[13px] text-signal-amber" style={{ minHeight: 140 }}>
         Apple Maps is not available yet: {err}
         <div className="mt-1 text-ink-300">Add APPLE_MAPKIT_TEAM_ID, APPLE_MAPKIT_KEY_ID and APPLE_MAPKIT_PRIVATE_KEY_PATH to .env, install PyJWT (uv add pyjwt cryptography) and restart the server. The 2D map works without it.</div>
       </div>

@@ -27,7 +27,7 @@ export default function AmountReveal({ countries, totalInr, onClose }) {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h3 id="amt-title" className="text-[20px] font-semibold text-white">How much money is needed</h3>
-            <p className="mt-1 text-[13.5px] text-ink-200">Estimated recovery need from flood exposure, run on the corrected elevation model.</p>
+            <p className="mt-1 text-[13px] text-ink-200">Estimated recovery need from flood exposure, run on the corrected elevation model.</p>
           </div>
           {finished && <button ref={btn} type="button" onClick={onClose} aria-label="Close" className="inline-flex items-center gap-1.5 rounded-lg border border-ink-600 px-3 py-1.5 text-[13px] font-medium text-ink-100 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-signal-teal"><X size={14} aria-hidden /> Close</button>}
         </div>
@@ -36,10 +36,10 @@ export default function AmountReveal({ countries, totalInr, onClose }) {
             const c = COUNTRY[x.iso] ?? COUNTRY.IND;
             return (
               <div key={x.iso} className="rounded-2xl border border-ink-700/70 bg-ink-950/50 p-4">
-                <div className="flex items-center gap-3 text-[15px] font-semibold text-white"><c.Flag size={30} /> {c.name} <span className="text-[12.5px] font-normal text-ink-300">in {c.code}</span></div>
+                <div className="flex items-center gap-3 text-[15px] font-semibold text-white"><c.Flag size={30} /> {c.name} <span className="text-[13px] font-normal text-ink-300">in {c.code}</span></div>
                 <dl className="mt-3 grid gap-3 sm:grid-cols-2">
                   {[["From", x.need_min], ["To", x.need_max]].map(([k, v], j) => (
-                    <div key={k}><dt className="text-[12.5px] text-ink-300">{k}</dt>
+                    <div key={k}><dt className="text-[13px] text-ink-300">{k}</dt>
                       <dd className="mt-1 flex items-center gap-2 text-white"><span className="text-[26px] font-bold text-signal-teal" aria-hidden>{c.symbol}</span><SpinNumber text={fmt(v)} size={30} delay={i * 200 + j * 120} onDone={bump} /></dd></div>
                   ))}
                 </dl>
@@ -55,7 +55,7 @@ export default function AmountReveal({ countries, totalInr, onClose }) {
             </div>
           </div>
         </div>
-        <p className="mt-4 text-[12.5px] text-ink-300">An estimate for planning, not a release decision and not a forecast. Nepal is converted at 1 INR = 1.60 NPR.</p>
+        <p className="mt-4 text-[13px] text-ink-300">An estimate for planning, not a release decision and not a forecast. Nepal is converted at 1 INR = 1.60 NPR.</p>
       </div>
     </div>, document.body);
 }

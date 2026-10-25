@@ -1,19 +1,16 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Download } from "lucide-react";
 import { fetchScenario, fmtInt, fmtCompact, fmtMoney, fmtRange, fmtPct, NO_DATA } from "../../lib/sdgApi";
 import { Banner, Segmented, StatCard, Section } from "./Ui";
 import MapTabs from "./MapTabs";
 import CoordinateBox from "./CoordinateBox";
 import MapDescription from "./MapDescription";
-import { buildPlaceReport } from "../../lib/placeReport";
 
 const STEPS = [
   { id: "flood", label: "1 Flood" },
   { id: "people", label: "2 People and crops" },
   { id: "house", label: "3 Households and hunger" },
   { id: "money", label: "4 Money" },
-  { id: "report", label: "5 Report" },
 ];
 const RADII = [{ id: 5, label: "5 km" }, { id: 10, label: "10 km" }, { id: 20, label: "20 km" }];
 
@@ -25,7 +22,7 @@ export function Curve({ curve, rise, field = "flooded_km2", title = "Flooded are
   const line = (k) => curve.map((c) => `${X(c.rise)},${Y(val(c, k))}`).join(" ");
   return (
     <div className="rounded-xl border border-ink-700/60 bg-ink-900/50 p-5">
-      <div className="text-[14px] font-medium text-white mb-1">{title}</div>
+      <div className="text-[13px] font-medium text-white mb-1">{title}</div>
       <svg viewBox="0 0 300 124" className="w-full">
         <line x1="28" y1="108" x2="292" y2="108" stroke="currentColor" className="text-ink-600" />
         <line x1="28" y1="10" x2="28" y2="108" stroke="currentColor" className="text-ink-600" />
@@ -35,7 +32,7 @@ export function Curve({ curve, rise, field = "flooded_km2", title = "Flooded are
         {curve.map((c) => <text key={c.rise} x={X(c.rise)} y="120" fontSize="8" textAnchor="middle" fill="currentColor" className="text-ink-400">{c.rise}</text>)}
         <text x="24" y="14" fontSize="8" textAnchor="end" fill="currentColor" className="text-ink-400">{Math.round(maxY).toLocaleString("en-IN")}</text>
       </svg>
-      <div className="mt-2 flex flex-wrap gap-4 text-[12.5px] text-ink-300">
+      <div className="mt-2 flex flex-wrap gap-4 text-[13px] text-ink-300">
         <span><span className="inline-block w-3 h-0.5 bg-signal-teal mr-1 align-middle" />Corrected DEM</span>
         <span><span className="inline-block w-3 h-0.5 bg-signal-amber mr-1 align-middle" />Raw DEM</span>
         <span>x: river rise (m). y: {yLabel}</span>
@@ -48,10 +45,10 @@ export function Curve({ curve, rise, field = "flooded_km2", title = "Flooded are
 const fmtAmount = (v, cur) => `${cur === "NPR" ? "NPR " : "₹"}${Math.round(v).toLocaleString("en-IN")}`;
 
 function Tech({ on, children }) {
-  return on ? <div className="mt-3 rounded-lg border border-ink-700/60 bg-ink-900/50 p-3 text-[11px] leading-relaxed text-ink-300">{children}</div> : null;
+  return on ? <div className="mt-3 rounded-lg border border-ink-700/60 bg-ink-900/50 p-3 text-[12px] leading-relaxed text-ink-300">{children}</div> : null;
 }
 
-export default function ChainTab({ initialPoint, technical, meta }) {
+export default function ChainTab({ initialPoint, technical }) {
   const [point, setPoint] = useState(initialPoint);
   const [radius, setRadius] = useState(10);
   const [riseInput, setRiseInput] = useState(2);
@@ -76,14 +73,14 @@ export default function ChainTab({ initialPoint, technical, meta }) {
       <Banner>{d?.label ?? "What-if scenario from terrain height above the nearest river. Not a forecast. Not a release decision."}</Banner>
 
       <div className="mt-3 flex flex-wrap items-center gap-3">
-        <span className="text-[12px] text-ink-300">Circle around the place</span>
+        <span className="text-[13px] text-ink-300">Circle around the place</span>
         <Segmented options={RADII} value={radius} onChange={setRadius} />
-        <label className="flex items-center gap-2 text-[12px] text-ink-300">
+        <label className="flex items-center gap-2 text-[13px] text-ink-300">
           River rises
           <input type="range" min="0.5" max="8" step="0.5" value={riseInput} onChange={(e) => setRiseInput(Number(e.target.value))} />
           <span className="w-12 font-mono text-ink-100">{riseInput} m</span>
         </label>
-        <span className="text-[11px] text-ink-400">{point ? `Place: ${point.lat.toFixed(4)} N, ${point.lng.toFixed(4)} E${d?.here ? ` (${d.here.name}, ${d.here.iso})` : ""}` : "No place chosen yet"}</span>
+        <span className="text-[12px] text-ink-400">{point ? `Place: ${point.lat.toFixed(4)} N, ${point.lng.toFixed(4)} E${d?.here ? ` (${d.here.name}, ${d.here.iso})` : ""}` : "No place chosen yet"}</span>
       </div>
 
       <div className="mt-3">
@@ -98,7 +95,7 @@ export default function ChainTab({ initialPoint, technical, meta }) {
 
       <div className="mt-4 flex flex-wrap gap-1 border-b border-ink-700/60">
         {STEPS.map((s) => (
-          <button key={s.id} onClick={() => setStep(s.id)} className={`px-3 py-2 text-[12px] font-medium border-b-2 -mb-px ${step === s.id ? "border-signal-teal text-white" : "border-transparent text-ink-400 hover:text-white"}`}>{s.label}</button>
+          <button key={s.id} onClick={() => setStep(s.id)} className={`px-3 py-2 text-[13px] font-medium border-b-2 -mb-px ${step === s.id ? "border-signal-teal text-white" : "border-transparent text-ink-400 hover:text-white"}`}>{s.label}</button>
         ))}
       </div>
 
@@ -133,8 +130,8 @@ export default function ChainTab({ initialPoint, technical, meta }) {
             <StatCard label="Satellite-seen floods in the circle (cropland ha)" value={fmtRange(d.observed.lower.cropland_ha, d.observed.upper.cropland_ha, fmtInt)} sub="At least one year 2019-2026." />
           </div>
           {d.districts.length > 0 && (
-            <div className="mt-3 rounded-xl border border-ink-700/70 bg-ink-900/60 p-4 text-[12px] text-ink-200">
-              <div className="text-[14px] font-medium text-white mb-2">Districts touched (people exposed)</div>
+            <div className="mt-3 rounded-xl border border-ink-700/70 bg-ink-900/60 p-4 text-[13px] text-ink-200">
+              <div className="text-[13px] font-medium text-white mb-2">Districts touched (people exposed)</div>
               {d.districts.map((x) => <div key={x.name + x.iso} className="flex justify-between"><span>{x.name} ({x.iso})</span><span className="tabular-nums">{fmtInt(x.people)}</span></div>)}
             </div>
           )}
@@ -162,7 +159,7 @@ export default function ChainTab({ initialPoint, technical, meta }) {
           </div>
           {mc.by_country.length > 0 && (
             <div className="mt-3 overflow-x-auto rounded-xl border border-ink-700/70">
-              <table className="w-full text-[12px]">
+              <table className="w-full text-[13px]">
                 <thead className="bg-ink-900 text-ink-300"><tr>{["Country", "People", "Households", "Relief cash", "Crop subsidy", "Need (min to max)"].map((h) => <th key={h} className="px-3 py-2 text-left font-medium whitespace-nowrap">{h}</th>)}</tr></thead>
                 <tbody>
                   {mc.by_country.map((x) => (
@@ -187,18 +184,7 @@ export default function ChainTab({ initialPoint, technical, meta }) {
         </Section>
       )}
 
-      {d && step === "report" && (
-        <Section title="Report" note="A PDF for this place: page 1 in plain words, page 2 the technical annex (method, assumptions with status, limits).">
-          <button
-            onClick={() => buildPlaceReport({ data: d, meta }).save(`impact-chain-${d.point.lat.toFixed(3)}N-${d.point.lon.toFixed(3)}E.pdf`)}
-            className="inline-flex items-center gap-2 rounded-lg border border-signal-teal/40 bg-signal-teal/10 px-4 py-2 text-[13px] font-medium text-signal-teal hover:bg-signal-teal/20"
-          >
-            <Download size={15} /> Download place report (PDF)
-          </button>
-          <p className="mt-3 text-[11px] text-ink-400">The full DEM Correction Report and SDG Report for the whole region come next.</p>
-        </Section>
-      )}
-      {q.isFetching && <p className="mt-2 text-[11px] text-ink-500">Updating...</p>}
+      {q.isFetching && <p className="mt-2 text-[12px] text-ink-500">Updating...</p>}
     </div>
   );
 }

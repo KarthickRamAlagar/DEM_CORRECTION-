@@ -13,7 +13,7 @@ export default function MapTabs({ point, radiusKm, overlay, onPick }) {
     <div>
       <div className="mb-2 inline-flex rounded-lg border border-ink-700/70 bg-ink-900/60 p-0.5">
         {TABS.map((t) => (
-          <button key={t.id} onClick={() => setTab(t.id)} className={`px-3 py-1.5 rounded-md text-[12px] font-medium ${tab === t.id ? "bg-ink-700 text-white" : "text-ink-300 hover:text-white"}`}>{t.label}</button>
+          <button key={t.id} onClick={() => setTab(t.id)} className={`px-3 py-1.5 rounded-md text-[13px] font-medium ${tab === t.id ? "bg-ink-700 text-white" : "text-ink-300 hover:text-white"}`}>{t.label}</button>
         ))}
       </div>
       {tab === "2d" && <PlaceMap point={point} radiusKm={radiusKm} overlay={overlay} onPick={onPick} />}

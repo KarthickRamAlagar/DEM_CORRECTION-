@@ -1,7 +1,6 @@
-import { jsPDF } from "jspdf";
-import { Flow, COL, num, money, range, DEV_NAME } from "./reportFlow";
+import { Flow, COL, num, money, range, DEV_NAME, newReportDoc, dec } from "./reportFlow";
 import { reportVersionLine } from "./reportVersion";
-import { elevationMap, floodMap, buildingMap, cellMap } from "./reportMaps";
+import { elevationMap, floodMap, buildingMap, cellMap, pngToJpeg } from "./reportMaps";
 import { addEvaluation } from "./evalSections";
 
 export const REPORT_PREFIX = "DEM-AREA-SDG";
@@ -12,7 +11,7 @@ export const reportFileName = (d) => `${REPORT_PREFIX}-${d.point.lat.toFixed(3)}
 // dem: result carried from New Inputs ({rawZ, correctedZ, zLo, zHi, date, inputs, engine}); extra: figures shown in the app;
 // scene: /chain/scene; region: /chain/region; evalData: {e, spatial} for the model evaluation (optional).
 export async function buildPlaceReport({ data, meta, dem = null, extra = {}, scene = null, region = null, evalData = null }) {
-  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const doc = newReportDoc();
   const c = data.scenario.corrected, r = data.scenario.raw, o = data.observed, m = data.money.corrected, mr = data.money.raw;
   const hh = (k) => (m.by_country.length ? m.by_country.reduce((s, x) => s + x[k], 0) : null);
   const where = data.here ? `${data.here.name} (${data.here.iso === "IND" ? "India" : "Nepal"})` : "Outside mapped districts";
@@ -55,12 +54,11 @@ export async function buildPlaceReport({ data, meta, dem = null, extra = {}, sce
   f.bullet(`Flood is a terrain what-if: land whose height above the nearest mapped river is at or below ${data.rise_m} m. No discharge, rainfall, embankments, bridges or time are modelled.`, [217, 119, 6]);
 
   // ---- page 2: index (filled at the end)
-  f.newPage(); f.h1("Contents"); f.para("What is in this report and where to find it.", { size: 8.5, color: COL.grey });
-  const indexPage = f.n;
+  const indexPage = f.reserveContents();
 
   // ---- DEM engine inputs
   const groups = dem?.inputs ?? [];
-  const row = (rows) => rows.map(([k, v]) => [k, v == null || Number.isNaN(v) ? "Not used by model" : String(v)]);
+  const row = (rows) => rows.map(([k, v]) => [k, dec(v)]);
   if (groups.length) {
     f.section("DEM engine inputs");
     f.para("Terrain, vegetation, signal and neighbourhood values the correction model used for this point.", { size: 8, color: COL.grey });
@@ -102,13 +100,14 @@ export async function buildPlaceReport({ data, meta, dem = null, extra = {}, sce
   f.bullet("The corrected DEM is not shown to improve flood prediction. Exposure is not casualties or damage.", [217, 119, 6]);
 
   // ---- region comparison maps
-  f.section("Comparison maps: region and elevation");
-  f.para("Raw DEM, corrected DEM and where they differ, across the Nepal Terai and the Indian plains beside it.", { size: 8, color: COL.grey });
+  f.section("Comparison maps: region and elevation", { minSpace: 120 });
+  f.para("Raw DEM, corrected DEM and where they differ, across the southern plains of Nepal and the Indian plains beside it.", { size: 8, color: COL.grey });
   if (region?.images) {
     const [[s0, w0], [n0, e0]] = region.bounds, asp = (n0 - s0) / ((e0 - w0) * Math.cos((((s0 + n0) / 2) * Math.PI) / 180));
     const dot = (x, y, w, h) => { const px = x + ((data.point.lon - w0) / (e0 - w0)) * w, py = y + ((n0 - data.point.lat) / (n0 - s0)) * h; doc.setFillColor(250, 204, 21); doc.setDrawColor(...COL.ink); doc.setLineWidth(0.3); doc.circle(px, py, 1.3, "FD"); doc.setLineWidth(0.2); };
-    const img = (b) => (b ? `data:image/png;base64,${b}` : null);
-    f.figures([{ caption: "Raw DEM flood", url: img(region.images.raw), aspect: asp, after: dot }, { caption: "Corrected DEM flood", url: img(region.images.corrected), aspect: asp, after: dot }, { caption: "Where they differ", url: img(region.images.difference), aspect: asp, after: dot }], { cols: 3 });
+    const jp = async (b) => (b ? pngToJpeg(`data:image/png;base64,${b}`) : null);
+    const [iRaw, iCor, iDif] = await Promise.all([jp(region.images.raw), jp(region.images.corrected), jp(region.images.difference)]);
+    f.figures([{ caption: "Raw DEM flood", url: iRaw, aspect: asp, after: dot }, { caption: "Corrected DEM flood", url: iCor, aspect: asp, after: dot }, { caption: "Where they differ", url: iDif, aspect: asp, after: dot }], { cols: 3 });
     f.legend([["Under water, both", COL.blue], ["Corrected DEM only", COL.violet], ["Raw DEM only", COL.orange]]);
     f.para(`River rise ${region.rise_m} m. Yellow dot is your place. Region map made from the 1 arc-second river-height layer; each block is about ${region.block_m} m.`, { size: 7.5, color: COL.grey });
   } else f.para("Region maps: No data. They could not be loaded for this report.", { color: COL.grey });
@@ -120,7 +119,7 @@ export async function buildPlaceReport({ data, meta, dem = null, extra = {}, sce
   }
 
   // ---- local flood comparison
-  f.section("Comparison maps: flood");
+  f.section("Comparison maps: flood", { minSpace: 120 });
   f.para(`A ${data.rise_m} m river rise inside the ${sr} km circle, raw against corrected.`, { size: 8, color: COL.grey });
   if (scene?.terrain) {
     const fr = floodMap(scene, "raw"), fc = floodMap(scene, "corrected"), fd = floodMap(scene, "diff");
@@ -135,7 +134,7 @@ export async function buildPlaceReport({ data, meta, dem = null, extra = {}, sce
   } else f.para("Flood maps: No data. The 3D scene data could not be loaded for this report.", { color: COL.grey });
 
   // ---- buildings
-  f.section("Buildings and people");
+  f.section("Buildings and people", { minSpace: 120 });
   f.h2("Buildings (SDG 11)");
   const bt = scene?.totals?.buildings;
   f.kpi([
@@ -163,7 +162,7 @@ export async function buildPlaceReport({ data, meta, dem = null, extra = {}, sce
   if (extra.nutrition) f.kv([[extra.nutrition.label, [extra.nutrition.value, extra.nutrition.sub].filter(Boolean).join(". ")]], { head: ["Child nutrition where this place lies", "Value"] });
 
   // ---- land and crops
-  f.section("Land and crops");
+  f.section("Land and crops", { minSpace: 120 });
   f.para("SDG 2 Zero Hunger and SDG 12 Land and Production. Exposure, not crop loss.", { size: 8, color: COL.grey });
   f.kpi([
     { label: "Cropland under water", value: `${num(c.cropland_ha)} ha`, sub: `Raw DEM: ${num(r.cropland_ha)} ha`, color: COL.blue },
@@ -180,6 +179,12 @@ export async function buildPlaceReport({ data, meta, dem = null, extra = {}, sce
 
   // ---- micro and macro economics
   f.section("Micro and macro economics");
+  f.moneyCard({
+    sub: "Estimated recovery need from flood exposure, run on the corrected elevation model.",
+    countries: m.by_country.map((x) => ({ iso: x.iso, name: country(x.iso), cur: x.currency, from: x.need_min, to: x.need_max })),
+    total: { iso: m.by_country.length === 1 ? m.by_country[0].iso : "IND", label: "Total in Indian rupees", from: m.need_min_inr, to: m.need_max_inr },
+    note: "An estimate for planning, not a release decision and not a forecast. Nepal is converted at 1 INR = 1.60 NPR.",
+  });
   f.kpi([
     { label: "Need, corrected DEM", value: money2(m.need_min_inr, m.need_max_inr), sub: "Lowest to highest unit cost", color: COL.green },
     { label: "Need, raw DEM", value: money2(mr.need_min_inr, mr.need_max_inr), sub: "Sensitivity check" },
@@ -214,8 +219,8 @@ export async function buildPlaceReport({ data, meta, dem = null, extra = {}, sce
     const items = [["INR per NPR", `1 INR = ${a.inr_to_npr.value} NPR`, a.inr_to_npr.status]];
     ["IND", "NPL"].forEach((k) => { const x = a[k], hs = x.household_size, rc = x.relief_cash_per_household, nm = k === "IND" ? "India" : "Nepal";
       items.push([`${nm} household size`, hs.low === hs.high ? `${hs.low}` : `${hs.low} to ${hs.high}`, hs.status]); items.push([`${nm} relief cash per household`, `${rc.value ?? `${rc.low} to ${rc.high}`} ${x.currency}`, rc.status]); });
-    f.h2("Assumptions and their status");
-    f.table([{ label: "Assumption", idx: 0, left: true, w: 2 }, { label: "Value", idx: 1, left: true, w: 1.3 }, { label: "Status", idx: 2, left: true, w: 1.7 }], items);
+    f.h2("Assumptions and sources");
+    f.table([{ label: "Assumption", idx: 0, left: true, w: 2 }, { label: "Value", idx: 1, left: true, w: 1.3 }, { label: "Source", idx: 2, left: true, w: 1.7 }], items);
   }
 
   // ---- model evaluation (same content as the Evaluation page report)

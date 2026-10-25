@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Target } from "lucide-react";
 import {
-  fetchSdgMeta, fetchSdgSummary, fetchSdgYearly, fetchSdgDistricts,
+  fetchSdgMeta, fetchSdgSummary, fetchSdgYearly, fetchSdgDistricts, fetchCropContext,
   fmtInt, fmtCompact, fmtMoney, fmtRange, fmtPct, NO_DATA,
 } from "../lib/sdgApi";
-import { Banner, Segmented, StatCard, Section } from "../components/sdg/Ui";
+import { Banner, Segmented, StatCard, Section, Bento, BentoCard } from "../components/sdg/Ui";
+import AboutBento from "../components/sdg/AboutBento";
+import { cropFigure } from "../components/sdg/ContextPanels";
 import DistrictTable from "../components/sdg/DistrictTable";
 import YearBars from "../components/sdg/YearBars";
 import ChainTab from "../components/sdg/ChainTab";
@@ -25,9 +27,9 @@ const TABS = [
   { id: "sdg12", label: "SDG 12 Land and Production" },
   { id: "funding", label: "Funding need" },
   { id: "future", label: "Future prediction" },
-  { id: "about", label: "Assumptions and limits" },
+  { id: "about", label: "Assumptions" },
 ];
-const COUNTRIES = [{ id: "IND", label: "India" }, { id: "NPL", label: "Nepal (Terai)" }];
+const COUNTRIES = [{ id: "IND", label: "India" }, { id: "NPL", label: "Nepal (plains)" }];
 const BOUNDS = [{ id: "lower_unflagged", label: "Conservative" }, { id: "upper_union", label: "Upper" }];
 
 export default function SdgPage() {
@@ -47,7 +49,6 @@ export default function SdgPage() {
   }, []);
   const chainPoint = null;
   const [tab, setTab] = useState("funding");
-  const [view, setView] = useState("simple");
   const [country, setCountry] = useState("IND");
   const [year, setYear] = useState("ever");
   const [bound, setBound] = useState("upper_union");
@@ -56,13 +57,14 @@ export default function SdgPage() {
   const meta = useQuery({ queryKey: ["sdg-meta"], queryFn: fetchSdgMeta });
   const summary = useQuery({ queryKey: ["sdg-summary", country, year, coveredOnly], queryFn: () => fetchSdgSummary({ country, year, covered_only: coveredOnly }) });
   const yearly = useQuery({ queryKey: ["sdg-yearly", country, coveredOnly], queryFn: () => fetchSdgYearly({ country, covered_only: coveredOnly }) });
-  const sortFor = { sdg2: "cropland", sdg11: "people", funding: "need" };
+  const sortFor = { sdg2: "cropland", sdg12: "cropland", sdg11: "people", funding: "need" };
   const districts = useQuery({
     queryKey: ["sdg-districts", country, year, bound, coveredOnly, tab],
     queryFn: () => fetchSdgDistricts({ country, year, bound, covered_only: coveredOnly, sort: sortFor[tab] ?? "people", limit: 15 }),
-    enabled: ["sdg2", "sdg11", "funding"].includes(tab),
+    enabled: ["sdg2", "sdg11", "sdg12", "funding"].includes(tab),
   });
 
+  const cropQ = useQuery({ queryKey: ["crop-ctx"], queryFn: fetchCropContext, retry: 0, enabled: tab === "sdg12" && country !== "NPL" });
   const s = summary.data;
   const cur = s?.currency;
   const lo = s?.bounds?.lower_unflagged;
@@ -79,10 +81,10 @@ export default function SdgPage() {
           </div>
           <div>
             <h1 className="text-[22px] font-semibold leading-tight text-white">SDG Impact</h1>
-            <p className="text-[13.5px] text-ink-200">Observed floods, people, cropland and estimated recovery need. India and Nepal Terai.</p>
+            <p className="text-[13px] text-ink-200">Observed floods, people, cropland and estimated recovery need. India and the southern plains of Nepal.</p>
           </div>
           {mode === "explore" && (
-            <button onClick={() => setMode("intro")} className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-ink-600 px-3.5 py-2 text-[13.5px] font-medium text-ink-100 hover:text-white"><ArrowLeft size={13} /> Guide</button>
+            <button onClick={() => setMode("intro")} className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-ink-600 px-3.5 py-2 text-[13px] font-medium text-ink-100 hover:text-white"><ArrowLeft size={13} /> Guide</button>
           )}
         </div>
 
@@ -110,8 +112,7 @@ export default function SdgPage() {
             <option value="ever">Ever flooded 2019-2026</option>
             {(meta.data?.years ?? []).map((y) => <option key={y} value={y}>{y}</option>)}
           </select>}
-          {["sdg2", "sdg11", "funding"].includes(tab) && <Segmented options={BOUNDS} value={bound} onChange={setBound} />}
-          {tab !== "future" && <Segmented options={[{ id: "simple", label: "Simple" }, { id: "technical", label: "Technical" }]} value={view} onChange={setView} />}
+          {["sdg2", "sdg11", "sdg12", "funding"].includes(tab) && <Segmented options={BOUNDS} value={bound} onChange={setBound} />}
           {!["chain", "region", "future"].includes(tab) && (
             <label className="flex items-center gap-1.5 text-[13px] text-ink-200">
               <input type="checkbox" checked={coveredOnly} onChange={(e) => setCoveredOnly(e.target.checked)} />
@@ -120,12 +121,12 @@ export default function SdgPage() {
           )}
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-1 border-b border-ink-700/60">
+        <div className="mt-4 flex flex-nowrap gap-1 overflow-x-auto border-b border-ink-700/60">
           {TABS.map((t) => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`px-4 py-2.5 text-[14px] font-medium border-b-2 -mb-px ${
+              className={`shrink-0 whitespace-nowrap px-3 py-2.5 text-[13px] font-medium border-b-2 -mb-px ${
                 tab === t.id ? "border-signal-teal text-white" : "border-transparent text-ink-400 hover:text-white"
               }`}
             >
@@ -138,16 +139,17 @@ export default function SdgPage() {
           <div className="mt-4"><Banner tone="amber">The SDG API did not answer. Start the server and check that the SDG tables exist (etl/sdg). Nothing is shown instead of guessing.</Banner></div>
         )}
         {s && !["chain", "region", "future"].includes(tab) && (
-          <p className="mt-3 text-[12.5px] text-ink-300">
+          <p className="mt-3 text-[13px] text-ink-300">
             {s.districts_total - s.districts_left_out} of {s.districts_total} districts shown
             {coveredOnly && s.districts_left_out > 0 ? `; ${s.districts_left_out} left out for partial satellite coverage` : ""}.
             Only the part of each district inside the study region is counted.
           </p>
         )}
 
+
         {tab === "region" && <div className="mt-5"><RegionFloodMaps /></div>}
         {tab === "future" && <FuturePredictionTab onStartFlow={startFlowAt} />}
-        {tab === "chain" && <ChainTab initialPoint={chainPoint ? { lat: chainPoint.lat, lng: chainPoint.lng } : null} technical={view === "technical"} meta={meta.data} />}
+        {tab === "chain" && <ChainTab initialPoint={chainPoint ? { lat: chainPoint.lat, lng: chainPoint.lng } : null} meta={meta.data} />}
 
         {tab === "sdg2" && s && (
           <>
@@ -183,19 +185,42 @@ export default function SdgPage() {
           </>
         )}
 
-        {tab === "sdg12" && (
-          <Section title="Land and production (SDG 12)">
-            <StatCard label="Slope, land cover and erosion" value={NO_DATA} noData sub="Not computed yet. Planned: slope from the corrected DEM and land cover only. No erosion or soil-loss claims will be made." />
-          </Section>
+        {tab === "sdg12" && s && (
+          <>
+            <Section title="Land and production (SDG 12)" note="Cropland is the production base of the flood plain. These figures are cropland inside the observed flood footprint. Exposure, not crop loss.">
+              <Bento>
+                <BentoCard title="Cropland flooded" value={`${fmtInt(sel?.cropland_ha_exposed)} ha`} sub={`${fmtPct(sel?.district_cropland_ha ? (100 * sel.cropland_ha_exposed) / sel.district_cropland_ha : null)} of the cropland in these districts`} className="md:col-span-3 lg:col-span-4" />
+                <BentoCard title="Range across bounds" value={fmtRange(lo?.cropland_ha_exposed, up?.cropland_ha_exposed, fmtInt)} sub="Conservative to upper (ha)" className="md:col-span-3 lg:col-span-4" />
+                <BentoCard title="Flooded area" value={`${fmtInt(sel?.flooded_km2)} km²`} sub="Observed flood footprint, selected bound" className="md:col-span-6 lg:col-span-4" />
+                {(() => {
+                  const cf = cropFigure(country, cropQ.data, sel?.cropland_ha_exposed);
+                  return <BentoCard title={cf.label} value={cf.value} sub={cf.sub} className="md:col-span-3 lg:col-span-6" />;
+                })()}
+                <BentoCard
+                  title="Crop input subsidy need"
+                  value={isNepal ? NO_DATA : fmtRange(sel?.crop_min, sel?.crop_max, (v) => fmtMoney(v, cur))}
+                  sub={isNepal ? "The Nepal 2081 standard has no crop rate, so no number is made up." : "A ceiling: it applies only where crop loss is 33% or more."}
+                  className="md:col-span-3 lg:col-span-6"
+                />
+              </Bento>
+            </Section>
+            <Section title="By year" note="Each year counts places flooded at least once that year.">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                <YearBars rows={yearly.data?.rows ?? []} field="cropland_ha_exposed" format={(v) => `${fmtInt(v)} ha`} title="Cropland flooded" />
+                <YearBars rows={yearly.data?.rows ?? []} field="flooded_km2" format={(v) => `${fmtInt(v)} km²`} title="Flooded area" />
+              </div>
+            </Section>
+            <Section title="Districts with the most cropland flooded"><DistrictTable rows={districts.data?.rows} kind="sdg2" /></Section>
+          </>
         )}
 
         {tab === "funding" && s && (
           <>
             <Section title="Estimated recovery need" note={`Relief cash per household${isNepal ? "" : " plus crop input subsidy"}. ${isNepal ? "Nepal crops: no documented rate, so not included." : ""}`}>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <StatCard label="Conservative bound" value={fmtRange(lo?.need_min, lo?.need_max, (v) => fmtMoney(v, cur))} sub="Unflagged scenes only; min to max over unit-cost and household-size ranges" />
-                <StatCard label="Upper bound" value={fmtRange(up?.need_min, up?.need_max, (v) => fmtMoney(v, cur))} sub="Unflagged plus flagged scenes" />
-                <StatCard label="In INR (upper bound)" value={fmtRange(up?.need_min_inr, up?.need_max_inr, (v) => fmtMoney(v, "INR"))} sub={isNepal ? "Nepal amounts converted at 1.60 NPR per INR (Nepal Rastra Bank fixed rate, 21 Oct 2026)" : "Native currency"} />
+                <StatCard active={bound === "lower_unflagged"} label="Conservative bound" value={fmtRange(lo?.need_min, lo?.need_max, (v) => fmtMoney(v, cur))} sub="Unflagged scenes only; min to max over unit-cost and household-size ranges" />
+                <StatCard active={bound === "upper_union"} label="Upper bound" value={fmtRange(up?.need_min, up?.need_max, (v) => fmtMoney(v, cur))} sub="Unflagged plus flagged scenes" />
+                <StatCard label={`In INR (${bound === "upper_union" ? "upper" : "conservative"} bound)`} value={fmtRange(sel?.need_min_inr, sel?.need_max_inr, (v) => fmtMoney(v, "INR"))} sub={isNepal ? "Nepal amounts converted at 1.60 NPR per INR (Nepal Rastra Bank fixed rate, 21 Oct 2026)" : "Native currency"} />
               </div>
             </Section>
             <Section title="By year" note="Each year counts places flooded at least once that year. The ever-flooded figure is a combined footprint, not the sum of years.">
@@ -209,33 +234,7 @@ export default function SdgPage() {
           </>
         )}
 
-        {tab === "about" && meta.data && (
-          <>
-            <Section title="Limits you should know"><ul className="list-disc pl-5 space-y-1.5 text-[13px] text-ink-100">{meta.data.limitations.map((l) => <li key={l}>{l}</li>)}</ul></Section>
-            <Section title="Unit costs and assumptions" note="Status shows how well each value is checked.">
-              <div className="overflow-x-auto rounded-xl border border-ink-700/60">
-                <table className="w-full text-[13.5px]">
-                  <thead className="bg-ink-850/80 text-ink-200"><tr><th className="text-left px-4 py-3 text-[13px] font-medium">Item</th><th className="text-left px-4 py-3 text-[13px] font-medium">Value</th><th className="text-left px-4 py-3 text-[13px] font-medium">Source</th><th className="text-left px-4 py-3 text-[13px] font-medium">Status</th></tr></thead>
-                  <tbody>
-                    {Object.entries(meta.data.assumptions).filter(([, v]) => v && typeof v === "object" && !Array.isArray(v)).flatMap(([group, items]) =>
-                      group === "inr_to_npr"
-                        ? [[group, "Exchange rate (NPR per INR)", items]]
-                        : Object.entries(items).filter(([, v]) => v && typeof v === "object").map(([k, v]) => [`${group} ${k}`, `${group}: ${k.replaceAll("_", " ")}`, v])
-                    ).map(([key, label, v]) => (
-                      <tr key={key} className="border-t border-ink-700/50 align-top">
-                        <td className="px-4 py-2.5 text-white">{label}</td>
-                        <td className="px-4 py-2.5 tabular-nums">{v.value ?? [v.low, v.high].filter((x) => x != null).join(" to ")}</td>
-                        <td className="px-4 py-2.5 text-ink-200">{v.source ?? v.what ?? ""}</td>
-                        <td className="px-4 py-2.5 text-signal-amber">{v.status}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Section>
-            <p className="mt-4 text-[12.5px] text-ink-300">{meta.data.region}</p>
-          </>
-        )}
+        {tab === "about" && meta.data && <AboutBento meta={meta.data} />}
         </>}
       </div>
     </div>

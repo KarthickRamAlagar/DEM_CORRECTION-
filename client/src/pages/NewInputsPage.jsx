@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { MapContainer, TileLayer, Rectangle, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { jsPDF } from "jspdf";
 import { Sparkles, ChevronDown, Mic, ArrowRight, ArrowLeft, Mountain, Leaf, Radio, Grid3x3, MapPin, Calendar } from "lucide-react";
 import { DARK_BASEMAP_URL, DARK_BASEMAP_ATTRIBUTION } from "../components/ImageryOverlayLayer";
 import { speakText } from "../lib/speakText";
@@ -13,7 +12,8 @@ import { getSettings } from "../lib/settingsStore";
 
 const PREDICT_API = `${API_BASE}/predict`;
 
-import { DEVELOPER_GITHUB_URL, DEVELOPER_LINKEDIN_URL, makeIconPng } from "../lib/developerLinks";
+import { newReportDoc, Flow, COL, dec } from "../lib/reportFlow";
+import { reportVersionLine } from "../lib/reportVersion";
 const STUDY_BOUNDS = [[25, 80], [28, 84]];
 let AVAILABLE_YEARS_WITH_DATA = [2022, 2024, 2025, 2026];   // year fix: years come from the server
 fetch(`${PREDICT_API}/available-years`)
@@ -701,334 +701,74 @@ function TechnicalMode() {
   const generatePdf = async () => {
     const pdfSettings = getSettings();
     const dp = pdfSettings.pdfDecimalPlaces; // real setting, used everywhere below instead of hardcoded .toFixed(2)
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const TEAL = [45, 212, 191];
-    const DARK = [15, 23, 42];
-    const GOLD = [190, 160, 55];
-    let y = 32;
-    let pageNum = 1;
+    const ok = !!result && !result.error;
 
-    let kalamImageData = null;
+    // the picture for the cover (read once as a data URL)
+    let kalam = null;
     try {
-      const imgResponse = await fetch("/assets/kalam-character.png");
-      const blob = await imgResponse.blob();
-      kalamImageData = await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.readAsDataURL(blob);
+      const blob = await (await fetch("/assets/kalam-character.png")).blob();
+      kalam = await new Promise((resolve) => { const reader = new FileReader(); reader.onloadend = () => resolve(reader.result); reader.readAsDataURL(blob); });
+    } catch { kalam = null; }
+
+    // ONE template for every report (lib/reportFlow.js): same border, headings, tables and footer as the Evaluation report.
+    const doc = newReportDoc();
+    const f = new Flow(doc, { label: "Technical Prediction Report" });
+    f.disclaimer = "This report preserves the prediction values returned by the DEM-Correction model. Please cross-verify them, as predictions can sometimes contain errors.";
+    const corrected = ok ? values.raw_z + result.predicted_error : null;
+    const fx = (v) => (v == null || Number.isNaN(v) ? "No data" : `${Number(v).toFixed(dp)} m`);
+
+    f.title("Digital elevation model correction report", "Hybrid machine-learning based elevation error correction report");
+
+    if (pdfSettings.pdfIncludePredictionSummary && ok) {
+      f.heroCard({
+        image: kalam, imageAspect: 269 / 227,
+        label: "New corrected value", value: fx(corrected),
+        drop: `${result.predicted_error <= 0 ? "Lower" : "Higher"} by ${Math.abs(result.predicted_error).toFixed(dp)} m`,
+        items: [["Old estimate", fx(values.raw_z)], ["Predicted correction", fx(result.predicted_error)]],
       });
-    } catch {
-      kalamImageData = null;
     }
-
-    // header shows the day the report is downloaded (local date), not the prediction date
-    const now = new Date();
-    const generatedOn = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-
-    const addHeaderFooter = () => {
-      doc.setFontSize(9);
-      doc.setTextColor(...TEAL);
-      doc.setFont(undefined, "bold");
-      doc.text("DEM-CORRECTION", 14, 12);
-      doc.setTextColor(120, 120, 120);
-      doc.setFont(undefined, "normal");
-      doc.text(generatedOn, pageWidth - 14, 12, { align: "right" });
-      doc.setDrawColor(...TEAL);
-      doc.line(14, 15, pageWidth - 14, 15);
-
-      doc.setFontSize(8);
-      doc.setTextColor(140, 140, 140);
-      doc.text("DEM-CORRECTION ENGINE  Technical Prediction Report", 14, 285);
-      // page number is stamped after the last page, when the real total is known
-    };
-
-    const newPage = () => {
-      doc.addPage();
-      pageNum += 1;
-      y = 28;
-      addHeaderFooter();
-    };
-
-    addHeaderFooter();
-
-    doc.setFontSize(22);
-    doc.setFont("times", "bold");
-    doc.setTextColor(...GOLD);
-    doc.text("DIGITAL ELEVATION MODEL", 14, y);
-    y += 10;
-    doc.text("CORRECTION REPORT", 14, y);
-    y += 8;
-    doc.setFontSize(11);
-    doc.setFont("times", "bolditalic");
-    doc.setTextColor(90, 90, 90);
-    doc.text("Hybrid machine-learning based elevation error correction report", 14, y);
-    doc.setFont(undefined, "normal");
-    y += 8;
-
-    const imgBoxX = 14, imgBoxY = y, imgBoxW = 55, imgBoxH = 55;
-    if (kalamImageData) {
-      doc.setDrawColor(...TEAL);
-      doc.roundedRect(imgBoxX, imgBoxY, imgBoxW, imgBoxH, 3, 3, "S");
-      doc.addImage(kalamImageData, "PNG", imgBoxX + 3, imgBoxY + 3, imgBoxW - 6, imgBoxH - 6);
+    if (pdfSettings.pdfIncludeCorrectionInsight && ok) {
+      f.callout("Correction insight", [`The model estimated a vertical correction of ${fx(result.predicted_error)}, changing the original elevation from ${fx(values.raw_z)} to ${fx(corrected)}.`]);
+      f.kpi([
+        { label: "Model", value: result.model_used || "No data", sub: "" },
+        { label: "Validated RMSE", value: `${result.validated_rmse} m`, sub: "on areas the model has not seen", color: COL.blue },
+        { label: "Confidence", value: result.is_reliable ? "Reliable" : "Low confidence", sub: result.is_reliable ? "within the validated error" : "treat with care", color: result.is_reliable ? COL.green : COL.red },
+      ]);
     }
-
-    const correctedValue = result && !result.error ? (values.raw_z + result.predicted_error)?.toFixed(dp) : null;
-
-    if (pdfSettings.pdfIncludePredictionSummary && result && !result.error) {
-      const boxX = 76, boxW = pageWidth - 90;
-      doc.setFillColor(20, 40, 38);
-      doc.roundedRect(boxX, y, boxW, 55, 3, 3, "F");
-      doc.setDrawColor(...TEAL);
-      doc.roundedRect(boxX, y, boxW, 55, 3, 3, "S");
-
-      doc.setFontSize(10);
-      doc.setTextColor(...TEAL);
-      doc.setFont(undefined, "bold");
-      doc.text("NEW CORRECTED VALUE", boxX + 6, y + 10);
-
-      doc.setFontSize(20);
-      doc.setTextColor(255, 255, 255);
-      doc.text(`${correctedValue} m`, boxX + 6, y + 22);
-
-      doc.setFontSize(10);
-      doc.setTextColor(...TEAL);
-      doc.setFont(undefined, "normal");
-      doc.text(`${result.predicted_error <= 0 ? "Lower" : "Higher"} by ${Math.abs(result.predicted_error).toFixed(dp)} m`, boxX + 6, y + 30);
-
-      doc.setFontSize(9);
-      doc.setTextColor(...GOLD);
-      doc.setFont(undefined, "bold");
-      doc.text("OLD ESTIMATE", boxX + 6, y + 40);
-      doc.text("PREDICTED CORRECTION", boxX + 70, y + 40);
-      doc.setTextColor(230, 230, 230);
-      doc.setFont(undefined, "normal");
-      doc.text(`${values.raw_z?.toFixed(dp)} m`, boxX + 6, y + 47);
-      doc.text(`${result.predicted_error?.toFixed(dp)} m`, boxX + 70, y + 47);
-
-      y += 65;
-    }
-
-    if (pdfSettings.pdfIncludeCorrectionInsight && result && !result.error) {
-      doc.setFillColor(20, 40, 38);
-      doc.roundedRect(14, y, pageWidth - 28, 26, 3, 3, "F");
-      doc.setFontSize(10);
-      doc.setTextColor(...TEAL);
-      doc.setFont(undefined, "bold");
-      doc.text("CORRECTION INSIGHT", 20, y + 8);
-      doc.setFontSize(9);
-      doc.setTextColor(220, 220, 220);
-      doc.setFont(undefined, "normal");
-      doc.text(
-        `The model estimated a vertical correction of ${result.predicted_error?.toFixed(dp)} m, changing the`,
-        20, y + 15
-      );
-      doc.text(`original elevation from ${values.raw_z?.toFixed(dp)} m to ${correctedValue} m.`, 20, y + 20);
-      y += 36;
-
-      doc.setFillColor(234, 242, 221);
-      doc.rect(96, y - 6, 42, 20, "F");
-
-      doc.setFontSize(9);
-      doc.setTextColor(...GOLD);
-      doc.setFont(undefined, "bold");
-      doc.text("MODEL", 14, y);
-      doc.text("VALIDATED RMSE", 100, y);
-      doc.text("CONFIDENCE", 150, y);
-      y += 6;
-      doc.setTextColor(60, 60, 60);
-      doc.setFont(undefined, "normal");
-      doc.text(result.model_used || "-", 14, y, { maxWidth: 80 });
-      doc.setFont(undefined, "bold");
-      doc.setTextColor(30, 30, 30);
-      doc.text(`${result.validated_rmse} m`, 100, y);
-      doc.setTextColor(...TEAL);
-      doc.text(result.is_reliable ? "Reliable" : "Low confidence", 150, y);
-    }
-
-    const drawGroupTable = (groupName) => {
-      const fields = FEATURE_GROUPS[groupName];
-      const rowHeight = 8;
-      const tableWidth = pageWidth - 28;
-
-      if (y + 8 + rowHeight * 2 > 275) newPage();
-
-      doc.setFontSize(11);
-      doc.setTextColor(...TEAL);
-      doc.setFont(undefined, "bold");
-      doc.text(groupName.toUpperCase(), 14, y);
-      y += 8;
-
-      fields.forEach((field, i) => {
-        if (y + rowHeight > 275) newPage();
-        if (i % 2 === 1) {
-          doc.setFillColor(234, 242, 221);
-          doc.rect(14, y, tableWidth, rowHeight, "F");
-        }
-        doc.setFontSize(10);
-        doc.setTextColor(190, 160, 55);
-        doc.setFont(undefined, "bolditalic");
-        doc.text(FIELD_LABELS[field] || field, 18, y + 5.5);
-
-        doc.setTextColor(30, 30, 30);
-        doc.setFont(undefined, "bold");
-        const v = values[field];
-        const notProvided = v === undefined || v === null || (typeof v === "number" && Number.isNaN(v));
-        if (notProvided) {
-          doc.setFont(undefined, "italic");
-          doc.setTextColor(140, 140, 140);
-        }
-        doc.text(notProvided ? "Not used by model v2" : `${v}`, 14 + tableWidth - 6, y + 5.5, { align: "right" });
-        y += rowHeight;
-      });
-      y += 8;
-    };
 
     if (pdfSettings.pdfIncludeAllFeatures) {
-      newPage();
-      doc.setFontSize(14);
-      doc.setTextColor(...DARK);
-      doc.setFont(undefined, "bold");
-      doc.text("INPUT FEATURE ANALYSIS", 14, y);
-      y += 6;
-      doc.setFontSize(9);
-      doc.setTextColor(120, 120, 120);
-      doc.setFont(undefined, "normal");
-      doc.text("Terrain and vegetation characteristics used by the correction model.", 14, y);
-      y += 10;
-
-      drawGroupTable("Terrain Shape");
-      drawGroupTable("Vegetation & Land Cover");
-
-      newPage();
-      doc.setFontSize(14);
-      doc.setTextColor(...DARK);
-      doc.setFont(undefined, "bold");
-      doc.text("SIGNAL & SPATIAL FEATURES", 14, y);
-      y += 6;
-      doc.setFontSize(9);
-      doc.setTextColor(120, 120, 120);
-      doc.setFont(undefined, "normal");
-      doc.text("Radar observations and local neighborhood context.", 14, y);
-      y += 10;
-      drawGroupTable("Radar Signal");
-      drawGroupTable("Local Neighborhood");
-
-      newPage();
-      doc.setFontSize(14);
-      doc.setTextColor(...DARK);
-      doc.setFont(undefined, "bold");
-      doc.text("LOCATION & TECHNICAL DETAILS", 14, y);
-      y += 6;
-      doc.setFontSize(9);
-      doc.setTextColor(120, 120, 120);
-      doc.setFont(undefined, "normal");
-      doc.text("Environmental context and final model validation summary.", 14, y);
-      y += 10;
-      drawGroupTable("Location & Environment");
-    } else {
-      newPage(); // still need a page for location/validation sections below
+      f.section("Input feature analysis", { index: false, minSpace: 60 });
+      f.para("Terrain, vegetation, radar and neighbourhood values the correction model used for this point.", { size: 8, color: COL.grey });
+      Object.keys(FEATURE_GROUPS).forEach((groupName) => {
+        f.h2(groupName);
+        f.table([{ label: "Input", left: true, w: 3 }, { label: "Value", w: 1.6 }],
+          FEATURE_GROUPS[groupName].map((field) => { const v = values[field]; return [FIELD_LABELS[field] || field, v === undefined || v === null || (typeof v === "number" && Number.isNaN(v)) ? "Not used by model v2" : dec(v)]; }));
+      });
     }
 
     if (pickedLocation && pdfSettings.pdfIncludeLocation) {
-      if (y > 250) newPage();
-      doc.setFontSize(10);
-      doc.setTextColor(...TEAL);
-      doc.setFont(undefined, "bold");
-      doc.text("REAL LOCATION", 14, y);
-      y += 7;
-      doc.setFontSize(9);
-      doc.setTextColor(60, 60, 60);
-      doc.setFont(undefined, "normal");
-      doc.text(`${placeName || "Unknown"}`, 14, y);
-      y += 5;
-      doc.text(`${regionName(pickedLocation.lat)}`, 14, y);
-      y += 5;
-      doc.text(`${pickedLocation.lat.toFixed(4)}, ${pickedLocation.lng.toFixed(4)}`, 14, y);
-      y += 10;
+      f.h2("Real location");
+      f.kv([["Place", placeName || "Unknown"], ["Region", regionName(pickedLocation.lat)], ["Coordinates", `${pickedLocation.lat.toFixed(4)}, ${pickedLocation.lng.toFixed(4)}`]]);
     }
 
-    if (result && !result.error && pdfSettings.pdfIncludeValidation) {
-      if (y > 230) newPage();
-      doc.setFontSize(10);
-      doc.setTextColor(...TEAL);
-      doc.setFont(undefined, "bold");
-      doc.text("MODEL VALIDATION", 14, y);
-      y += 7;
-      doc.setFontSize(9);
-      const rows = [
-        ["Original elevation", `${values.raw_z?.toFixed(dp)} m`],
-        ["Predicted correction", `${result.predicted_error?.toFixed(dp)} m`],
-        ["Corrected elevation", `${(values.raw_z + result.predicted_error)?.toFixed(dp)} m`],
+    if (ok && pdfSettings.pdfIncludeValidation) {
+      f.h2("Model validation");
+      f.kv([
+        ["Original elevation", fx(values.raw_z)],
+        ["Predicted correction", fx(result.predicted_error)],
+        ["Corrected elevation", fx(corrected)],
         ["Validated RMSE", `${result.validated_rmse} m`],
         ["Confidence", result.is_reliable ? "Reliable" : "Low confidence"],
         ["Model", result.model_used],
         ...(result.interval_lower !== undefined ? [
-          ["Uncertainty range (nominal 90%, approx.)",
-            `${(values.raw_z + result.interval_lower)?.toFixed(dp)} m to ${(values.raw_z + result.interval_upper)?.toFixed(dp)} m`],
+          ["Uncertainty range (nominal 90%, approx.)", `${fx(values.raw_z + result.interval_lower)} to ${fx(values.raw_z + result.interval_upper)}`],
           ["Model version", `${result.model_version}`],
         ] : []),
-      ];
-      rows.forEach(([label, val]) => {
-        doc.setTextColor(...GOLD);
-        doc.setFont(undefined, "bold");
-        doc.text(label, 14, y);
-        doc.setTextColor(40, 40, 40);
-        doc.setFont(undefined, "normal");
-        doc.text(`${val}`, 100, y, { maxWidth: 90 });
-        y += 6;
-      });
-      y += 6;
+      ]);
     }
 
-    // Last page: "Developed by" + small LinkedIn / GitHub icons at the right end
-    // of the footer row, on the same line as the report name (left).
-    if (y > 255) newPage(); // keep this block clear of the report content
-    const ICON_MM = 5;
-    const footY = 285; // baseline of the footer text
-    const iconTop = footY - ICON_MM + 1.2;
-    const githubX = pageWidth - 14 - ICON_MM;
-    const linkedinX = githubX - 2.5 - ICON_MM;
-    const linkedinIcon = makeIconPng("linkedin");
-    const githubIcon = makeIconPng("github");
-    doc.setFont(undefined, "bold");
-    doc.setFontSize(8);
-    doc.setTextColor(90, 90, 90);
-    doc.text("Developed by", linkedinX - 2.5, footY, { align: "right" });
-    if (linkedinIcon) {
-      doc.addImage(linkedinIcon, "PNG", linkedinX, iconTop, ICON_MM, ICON_MM);
-      if (DEVELOPER_LINKEDIN_URL) doc.link(linkedinX, iconTop, ICON_MM, ICON_MM, { url: DEVELOPER_LINKEDIN_URL });
-    }
-    if (githubIcon) {
-      doc.addImage(githubIcon, "PNG", githubX, iconTop, ICON_MM, ICON_MM);
-      doc.link(githubX, iconTop, ICON_MM, ICON_MM, { url: DEVELOPER_GITHUB_URL });
-    }
-    doc.setDrawColor(200, 200, 200);
-    doc.line(14, 266, pageWidth - 14, 266);
-    doc.setFontSize(8);
-    doc.setTextColor(130, 130, 130);
-    doc.setFont(undefined, "italic");
-    doc.text(
-      "This report preserves the prediction values returned by the DEM-Correction model. Please cross-verify them, as predictions can sometimes contain errors.",
-      14,
-      273,
-      { maxWidth: pageWidth - 28 }
-    );
-
-    const totalPages = doc.getNumberOfPages();
-    for (let i = 1; i <= totalPages; i += 1) {
-      doc.setPage(i);
-      doc.setFontSize(8);
-      doc.setTextColor(140, 140, 140);
-      doc.setFont(undefined, "normal");
-      doc.text(
-        `${String(i).padStart(2, "0")} / ${String(totalPages).padStart(2, "0")}`,
-        pageWidth / 2,
-        291,
-        { align: "center" }
-      );
-    }
-
+    f.versionLine = await reportVersionLine();
+    f.finish();
     doc.save("dem-correction-technical-summary.pdf");
     setPdfMessage("PDF downloaded successfully");
   };

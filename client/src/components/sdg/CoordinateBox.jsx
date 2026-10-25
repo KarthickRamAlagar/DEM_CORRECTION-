@@ -40,16 +40,16 @@ export default function CoordinateBox({ point, onPick }) {
   const field = "w-28 rounded-md border border-ink-700 bg-ink-850/80 px-2.5 py-1.5 text-[13px] tabular-nums text-ink-100 placeholder:text-ink-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-signal-teal";
   return (
     <form onSubmit={go} className="flex flex-wrap items-end gap-3" aria-label="Go to coordinates">
-      <label className="flex flex-col gap-1 text-[12px] text-ink-300">Latitude (N)
+      <label className="flex flex-col gap-1 text-[13px] text-ink-300">Latitude (N)
         <input className={field} inputMode="decimal" autoComplete="off" placeholder="27.20" value={lat} onChange={(e) => setLat(e.target.value)} aria-label="Latitude in degrees north" />
       </label>
-      <label className="flex flex-col gap-1 text-[12px] text-ink-300">Longitude (E)
+      <label className="flex flex-col gap-1 text-[13px] text-ink-300">Longitude (E)
         <input className={field} inputMode="decimal" autoComplete="off" placeholder="82.55" value={lng} onChange={(e) => setLng(e.target.value)} aria-label="Longitude in degrees east" />
       </label>
       <button type="submit" className="inline-flex items-center gap-2 rounded-lg border border-signal-teal/60 bg-signal-teal/15 px-4 py-1.5 text-[13px] font-semibold text-signal-teal hover:bg-signal-teal/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-signal-teal">
         <MapPin size={14} aria-hidden /> Go to place
       </button>
-      {msg && <p role={msg.tone === "error" ? "alert" : "status"} className={`basis-full text-[12.5px] ${msg.tone === "error" ? "text-signal-amber" : "text-ink-300"}`}>{msg.text}</p>}
+      {msg && <p role={msg.tone === "error" ? "alert" : "status"} className={`basis-full text-[13px] ${msg.tone === "error" ? "text-signal-amber" : "text-ink-300"}`}>{msg.text}</p>}
     </form>
   );
 }

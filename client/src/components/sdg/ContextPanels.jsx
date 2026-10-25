@@ -13,7 +13,7 @@ const level = (iso) => (iso === "NPL" ? "province" : "state");
 
 export function Sources({ list, missing }) {
   return (
-    <div className="mt-3 max-w-3xl text-[12.5px] leading-relaxed text-ink-300">
+    <div className="mt-3 max-w-3xl text-[13px] leading-relaxed text-ink-300">
       {list.map((s) => (
         <p key={s.url} className="m-0">
           <a href={s.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-ink-100 underline underline-offset-2 hover:text-white">{s.name}<ExternalLink size={11} aria-hidden /></a>
@@ -40,7 +40,7 @@ export function NutritionPanel({ iso, focus }) {
   else cols.push({ key: "e", label: n.earlierLabel, align: "right", render: (r) => pc(r.earlier) });
   return (
     <div>
-      <h4 className="mb-2 text-[14.5px] font-semibold text-white">{n.title}</h4>
+      <h4 className="mb-2 text-[13px] font-semibold text-white">{n.title}</h4>
       <DataTable caption={n.title} rows={n.rows} rowKey={(r) => r.area} columns={cols} highlight={(r) => r.area === focus} />
       <Sources list={n.src} missing={n.missing} />
     </div>
@@ -55,16 +55,16 @@ export function EconPanels({ iso, focus }) {
   return (
     <div className="space-y-8">
       <div>
-        <h4 className="mb-2 text-[14.5px] font-semibold text-white">{e.micro.title}</h4>
+        <h4 className="mb-2 text-[13px] font-semibold text-white">{e.micro.title}</h4>
         <DataTable caption={e.micro.title} rows={e.micro.rows} rowKey={(r) => r.area} columns={microCols} highlight={(r) => r.area === focus} />
         <Sources list={e.micro.src} missing={e.micro.missing} />
       </div>
       <div>
-        <h4 className="mb-2 text-[14.5px] font-semibold text-white">{e.macro.title}</h4>
+        <h4 className="mb-2 text-[13px] font-semibold text-white">{e.macro.title}</h4>
         {e.macro.rows.length ? (
           <DataTable caption={e.macro.title} rows={e.macro.rows} rowKey={(r) => r.area} highlight={(r) => r.area === focus}
             columns={[{ key: "a", label: "State", render: (r) => r.area }, { key: "g", label: "Total output", align: "right", render: (r) => `₹${(r.gsdpCr / 1e5).toLocaleString("en-IN", { maximumFractionDigits: 2 })} lakh crore` }, { key: "p", label: "Per person", align: "right", render: (r) => rs(r.perCap) }]} />
-        ) : <p className="text-[14px] text-ink-300">{NO_DATA}</p>}
+        ) : <p className="text-[13px] text-ink-300">{NO_DATA}</p>}
         <Sources list={e.macro.src} missing={e.macro.missing} />
       </div>
     </div>
@@ -102,9 +102,9 @@ const croreRange = (r) => (r ? (Math.round(r[0] / 1e5) === Math.round(r[1] / 1e5
 
 export function CropPanel({ iso, ha }) {
   const q = useQuery({ queryKey: ["crop-ctx"], queryFn: fetchCropContext, retry: 0, enabled: iso !== "NPL" });
-  if (iso === "NPL") return <p className="text-[14px] leading-relaxed text-ink-200 max-w-3xl">Nepal: recent district yield tables could not be obtained; only 2014/15 cereal tables are on disk and they are not shown as current. {NO_DATA}.</p>;
-  if (q.isError) return <p className="text-[13.5px] leading-relaxed text-ink-300 max-w-3xl">{NO_DATA}. {q.error.message}</p>;
-  if (!q.data) return <p className="text-[13.5px] text-ink-300">Loading the crop table...</p>;
+  if (iso === "NPL") return <p className="text-[13px] leading-relaxed text-ink-200 max-w-3xl">Nepal: recent district yield tables could not be obtained; only 2014/15 cereal tables are on disk and they are not shown as current. {NO_DATA}.</p>;
+  if (q.isError) return <p className="text-[13px] leading-relaxed text-ink-300 max-w-3xl">{NO_DATA}. {q.error.message}</p>;
+  if (!q.data) return <p className="text-[13px] text-ink-300">Loading the crop table...</p>;
   const val = riceValueRange(q.data, ha);
   return (
     <div>
@@ -114,8 +114,8 @@ export function CropPanel({ iso, ha }) {
           { key: "a", label: "Area (ha)", align: "right", render: (r) => fmtInt(r.area_ha) }, { key: "p", label: "Production (t)", align: "right", render: (r) => fmtInt(r.production_t) },
           { key: "yy", label: "Yield (t per ha)", align: "right", render: (r) => r.yield_t_per_ha.toFixed(2) },
         ]} />
-      <p className="mt-3 max-w-3xl text-[12.5px] leading-relaxed text-ink-300">India APY table on disk. Summed over districts and seasons. </p>
-      <h4 className="mb-2 mt-7 text-[14.5px] font-semibold text-white">Minimum support price, ₹ per quintal</h4>
+      <p className="mt-3 max-w-3xl text-[13px] leading-relaxed text-ink-300">India APY table on disk. Summed over districts and seasons. </p>
+      <h4 className="mb-2 mt-7 text-[13px] font-semibold text-white">Minimum support price, ₹ per quintal</h4>
       <DataTable caption="Minimum support price" rows={Object.values(MSP)} rowKey={(r) => r.crop}
         columns={[{ key: "c", label: "Crop", render: (r) => r.crop }, { key: "s", label: "Season", render: (r) => r.season }, { key: "p", label: "MSP", align: "right", render: (r) => rs(r.price) }, { key: "pp", label: "Year before", align: "right", render: (r) => rs(r.previous) }]} />
       <Sources list={[MSP.rice.src, MSP.wheat.src]} />

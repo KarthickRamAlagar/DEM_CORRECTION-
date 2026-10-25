@@ -68,10 +68,10 @@ export default function View3D({ point, rise, defaultLayer = "buildings", seedRa
           })}
         </div>
       </div>
-      {apple.ok === false && <p className="mt-2 text-[12.5px] text-ink-300">Apple Maps 3D switches on when the Apple credentials are added to the server: {apple.why}</p>}
+      {apple.ok === false && <p className="mt-2 text-[13px] text-ink-300">Apple Maps 3D switches on when the Apple credentials are added to the server: {apple.why}</p>}
 
       <div className="mt-4">
-        {q.isLoading && <p className="text-[14px] text-ink-300">Building the 3D scene...</p>}
+        {q.isLoading && <p className="text-[13px] text-ink-300">Building the 3D scene...</p>}
         {q.isError && (
           <EmptyState compact emoji="🧭" title="The 3D view is not available here" detail={q.error.message}>
             It needs the river-height layer and the elevation files. Nothing is guessed.
@@ -91,16 +91,16 @@ export default function View3D({ point, rise, defaultLayer = "buildings", seedRa
                 {layer !== "buildings" && <li className="inline-flex items-center gap-2"><span aria-hidden className="inline-block h-3 w-3 rounded-[3px]" style={{ background: layer === "crops" ? "#4ade80" : "#f2ece1" }} />{layer === "crops" ? "Cropland, not under water" : "People, not under water"}</li>}
               </ul>
             </div>
-            <p className="mt-2 max-w-3xl text-[12.5px] leading-relaxed text-ink-300">
+            <p className="mt-2 max-w-3xl text-[13px] leading-relaxed text-ink-300">
               {layer === "buildings" && "Each block is one mapped building footprint, drawn 1.5 times larger so it can be seen. Real heights are not in the data, so every block uses the same illustrative height."}
               {layer === "people" && `Each small figure stands for about ${fmtInt(peopleUnit(d))} people (WorldPop 2020, modelled). A 90 m cell with more people gets more figures, up to 10. Figures are drawn larger than life so they can be seen.`}
               {layer === "crops" && "Each striped tile is one 90 m field cell. A deeper green means more of the cell is cropland (ESA WorldCover 2021)."}
               {" "}Under water means the cell or building sits at or below the chosen river rise above the nearest river. Exposure only, not damage, not a forecast.
             </p>
-            <h4 className="mb-2 mt-6 inline-flex items-center gap-2 text-[14.5px] font-semibold text-white"><Ico size={15} aria-hidden /> What the two elevation models say, inside {radius} km</h4>
+            <h4 className="mb-2 mt-6 inline-flex items-center gap-2 text-[13px] font-semibold text-white"><Ico size={15} aria-hidden /> What the two elevation models say, inside {radius} km</h4>
             <DataTable caption="Raw against corrected DEM inside the 3D circle" rows={rows} rowKey={(r) => r.k}
               columns={[{ key: "k", label: "Under water", render: (r) => r.k }, { key: "r", label: "Raw DEM", align: "right", render: (r) => r.raw }, { key: "c", label: "Corrected DEM", align: "right", render: (r) => r.corrected }, { key: "co", label: "Only corrected", align: "right", render: (r) => r.co }, { key: "ro", label: "Only raw", align: "right", render: (r) => r.ro }, { key: "a", label: "All inside", align: "right", render: (r) => r.all }]} />
-            {d.notes.map((n) => <p key={n} className="mt-2 max-w-3xl text-[12.5px] leading-relaxed text-ink-300">{n}</p>)}
+            {d.notes.map((n) => <p key={n} className="mt-2 max-w-3xl text-[13px] leading-relaxed text-ink-300">{n}</p>)}
           </>
         )}
       </div>

@@ -18,13 +18,13 @@ export default function SdgContinueButton({ lat, lng, corrected, raw, interval =
     try { sessionStorage.setItem("sdg_chain_point", JSON.stringify({ lat, lng, corrected, raw, interval, date, inputs, engine, from: "dem-engine" })); } catch (e) { /* storage blocked */ }
     window.dispatchEvent(new CustomEvent("app-navigate", { detail: "sdg" }));
   };
-  const cls = className || "w-full rounded-lg border border-signal-teal/40 bg-signal-teal/10 px-3 py-2 text-[12px] font-medium text-signal-teal hover:bg-signal-teal/20";
+  const cls = className || "w-full rounded-lg border border-signal-teal/40 bg-signal-teal/10 px-3 py-2 text-[13px] font-medium text-signal-teal hover:bg-signal-teal/20";
   if (ok) return <button type="button" onClick={go} className={cls}>{children}</button>;
   return (
     <span className="relative block" onMouseEnter={() => setTip(true)} onMouseLeave={() => setTip(false)} onFocus={() => setTip(true)} onBlur={() => setTip(false)} onClick={() => setTip((t) => !t)} tabIndex={0} aria-describedby={id}>
       <button type="button" disabled aria-disabled="true" tabIndex={-1} className={`${cls} pointer-events-none cursor-not-allowed opacity-50`}>{children}</button>
       {tip && (
-        <span id={id} role="tooltip" className="absolute bottom-full left-0 right-0 z-30 mb-2 flex items-start gap-2 rounded-lg border border-signal-amber/50 bg-ink-900 p-3 text-[12px] leading-snug text-ink-100 shadow-xl">
+        <span id={id} role="tooltip" className="absolute bottom-full left-0 right-0 z-30 mb-2 flex items-start gap-2 rounded-lg border border-signal-amber/50 bg-ink-900 p-3 text-[13px] leading-snug text-ink-100 shadow-xl">
           <Info size={15} aria-hidden className="mt-0.5 shrink-0 text-signal-amber" />
           <span>{missing ? NOTE_MISSING : NOTE}</span>
         </span>

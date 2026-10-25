@@ -18,7 +18,7 @@ export default function AssetsCard({ point, radius, rise }) {
     enabled: !!point, retry: 0,
   });
   if (q.isError) return <div className="mt-3"><Banner tone="amber">Roads and facilities: {q.error.message}</Banner></div>;
-  if (!q.data) return <p className="mt-3 text-[13.5px] text-ink-300">Counting roads, bridges, schools and health facilities...</p>;
+  if (!q.data) return <p className="mt-3 text-[13px] text-ink-300">Counting roads, bridges, schools and health facilities...</p>;
   const d = q.data;
   if (!d.available) return <div className="mt-3"><Banner tone="amber">{d.message}</Banner></div>;
   const c = d.scenario.corrected, r = d.scenario.raw;
@@ -51,7 +51,7 @@ export default function AssetsCard({ point, radius, rise }) {
       </div>
       {listed.length > 0 && (
         <div className="mt-4 overflow-x-auto rounded-xl border border-ink-700/70">
-          <table className="w-full min-w-[420px] text-left text-[13.5px]">
+          <table className="w-full min-w-[420px] text-left text-[13px]">
             <caption className="sr-only">Named places on land under water</caption>
             <thead className="bg-ink-850/70 text-ink-200"><tr><th scope="col" className="px-3 py-2 font-medium">Place</th><th scope="col" className="px-3 py-2 font-medium">Type</th><th scope="col" className="px-3 py-2 font-medium text-right">Height above river</th></tr></thead>
             <tbody>{listed.map((x, i) => (

@@ -131,9 +131,9 @@ export default function Scene3D({ data, layer, dem, exag, heightM, modes, onStat
   const startXr = async (kind) => {
     if (!navigator.xr || !(kind === "vr" ? modes.vr : modes.ar)) {
       const why = !modes.secure ? "WebXR only works on https:// or localhost. Open the app that way, then try again."
-        : !modes.hasXr ? "This browser has no WebXR. Use Chrome or Edge on a desktop with a headset, the Meta Quest browser, or Chrome on an Android phone with ARCore."
+        : !modes.hasXr ? "This browser has no WebXR. Use Chrome or Edge on a desktop with a headset, or the Meta Quest browser."
         : kind === "vr" ? "No VR headset is connected to this browser. Connect one (or install the Immersive Web Emulator browser extension to test), then try again."
-        : "AR needs an Android phone with Chrome and ARCore, or an AR headset browser.";
+        : "AR needs a device with Chrome and ARCore, or an AR headset browser.";
       note(why); return;
     }
     const { renderer, scene } = api.current;
@@ -178,15 +178,15 @@ export default function Scene3D({ data, layer, dem, exag, heightM, modes, onStat
       <Icon size={15} aria-hidden /> {label}
     </button>
   );
-  const chip = (ok, t) => <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[12px] ${ok ? "border-signal-teal/50 text-signal-teal" : "border-ink-600 text-ink-300"}`}><span aria-hidden className={`h-2 w-2 rounded-full ${ok ? "bg-signal-teal" : "bg-ink-500"}`} />{t}</span>;
+  const chip = (ok, t) => <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[13px] ${ok ? "border-signal-teal/50 text-signal-teal" : "border-ink-600 text-ink-300"}`}><span aria-hidden className={`h-2 w-2 rounded-full ${ok ? "bg-signal-teal" : "bg-ink-500"}`} />{t}</span>;
 
   return (
     <div>
       {modes.webgl === false ? (
-        <div className="rounded-xl border border-ink-700/60 bg-ink-900/50 p-6 text-[14px] text-ink-100">This browser cannot draw 3D (WebGL is off). The 2D maps and all numbers still work.</div>
+        <div className="rounded-xl border border-ink-700/60 bg-ink-900/50 p-6 text-[13px] text-ink-100">This browser cannot draw 3D (WebGL is off). The 2D maps and all numbers still work.</div>
       ) : (
         <div ref={host} role="img" aria-label="3D view of the flooded area" className="relative w-full overflow-hidden rounded-2xl border border-ink-700/60 shadow-lg" style={{ height: 520, touchAction: "none", background: "#0b1016" }}>
-          {SATELLITE_GROUND && imagery === undefined && <span className="pointer-events-none absolute left-3 top-3 z-10 rounded-md bg-black/55 px-2.5 py-1 text-[12px] text-white">Loading satellite picture...</span>}
+          {SATELLITE_GROUND && imagery === undefined && <span className="pointer-events-none absolute left-3 top-3 z-10 rounded-md bg-black/55 px-2.5 py-1 text-[13px] text-white">Loading satellite picture...</span>}
         </div>
       )}
       {SATELLITE_GROUND && <p className="mt-1.5 text-[11.5px] text-ink-300">{imagery ? `${IMAGERY_ATTRIBUTION}.${imagery.partial ? " Some picture tiles did not load." : ""}` : imagery === null ? "The satellite picture could not be loaded here, so plain ground colours are used. Terrain, buildings and flood are unchanged." : ""}</p>}
@@ -195,15 +195,15 @@ export default function Scene3D({ data, layer, dem, exag, heightM, modes, onStat
           <>
             <Btn icon={Glasses} label="Enter VR" ok={modes.vr} onClick={() => startXr("vr")} hint="Headset view" />
             <Btn icon={ScanLine} label="Enter AR" ok={modes.ar} onClick={() => startXr("ar")} hint="Place the model on your table" />
-            <Btn icon={Columns2} label="Split-screen VR" ok onClick={() => startTilt(true)} hint="Two eyes side by side, for a phone in a viewer box. Works on any device." />
-            {modes.tilt && <Btn icon={Smartphone} label="Tilt view" ok onClick={() => startTilt(false)} hint="Move your phone to look around" />}
+            <Btn icon={Columns2} label="Split-screen VR" ok onClick={() => startTilt(true)} hint="Two eyes side by side, for a viewer box. Works on any device." />
+            {modes.tilt && <Btn icon={Smartphone} label="Tilt view" ok onClick={() => startTilt(false)} hint="Move your device to look around" />}
             <Btn icon={Maximize2} label="Reset view" ok={false} onClick={() => { api.current.skipFly?.(); api.current.home?.(); }} />
           </>
         ) : (
           <Btn icon={RotateCcw} label={mode === "vr" || mode === "ar" ? "Leave XR" : "Leave this view"} ok onClick={stop} />
         )}
       </div>
-      <div className="mt-3 flex flex-wrap items-center gap-2 text-[12.5px] text-ink-300">
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-[13px] text-ink-300">
         <span className="inline-flex items-center gap-1.5"><Info size={13} aria-hidden /> This device:</span>
         {chip(modes.vr, modes.vr ? "VR headset ready" : "No VR headset found")}
         {chip(modes.ar, modes.ar ? "AR ready" : "AR not available")}

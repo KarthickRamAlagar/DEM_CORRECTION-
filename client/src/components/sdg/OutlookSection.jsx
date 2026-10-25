@@ -2,12 +2,12 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchOutlook, fetchOutlookMethod } from "../../lib/outlookApi";
 import { fmtInt, fmtRange, fmtMoney, NO_DATA } from "../../lib/sdgApi";
-import { Banner, Segmented } from "./Ui";
+import { Banner, Segmented, Bento, BentoCard } from "./Ui";
 import { fmtDay, seasonYear } from "../../lib/dateFmt";
 
 // District flood outlook (patch 10). Numbers come from etl/forecast/build_outlook.py through /api/sdg/outlook. Nothing is computed here.
 // It is a statistical outlook for "a typical coming year", tested on years the model had not seen. It is not a flood warning and not a weather forecast.
-const COUNTRIES = [{ id: "IND", label: "India" }, { id: "NPL", label: "Nepal (Terai)" }];
+const COUNTRIES = [{ id: "IND", label: "India" }, { id: "NPL", label: "Nepal (plains)" }];
 const BOUNDS = [{ id: "lower_unflagged", label: "Conservative" }, { id: "upper_union", label: "Upper" }];
 const MODEL_NAME = { history: "Plain history", recent_weighted: "Recent years count more", trend: "Trend" };
 const pct = (v) => (v == null ? NO_DATA : `${Math.round(v * 100)}%`);
@@ -48,8 +48,8 @@ export default function OutlookSection() {
       {(q.isError || m.isError) && <div className="mt-3"><Banner tone="amber">{q.error?.message || m.error?.message}</Banner></div>}
 
       {rows.length > 0 && (
-        <div className="mt-3 overflow-x-auto rounded-xl border border-ink-700/70">
-          <table className="w-full min-w-[760px] text-left text-[13.5px]">
+        <div className="mt-3 overflow-x-auto rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-md">
+          <table className="w-full min-w-[760px] text-left text-[13px]">
             <caption className="sr-only">Outlook for a typical coming year, districts with the highest upper people-exposed range</caption>
             <thead className="bg-ink-850/70 text-ink-200"><tr>
               <th scope="col" className="px-3 py-2 font-medium">District</th>
@@ -63,7 +63,7 @@ export default function OutlookSection() {
                 <tr key={`${r.iso}-${r.district}`} className="border-t border-ink-700/50 text-ink-100">
                   <th scope="row" className="px-3 py-2 font-medium">{r.district}<div className="text-[11.5px] font-normal text-ink-400">{r.years_with_flooding} of {r.years_in_record} years had flooding</div></th>
                   <td className="px-3 py-2 tabular-nums">{r.p_flood_low == null ? pct(r.p_flood) : `${pct(r.p_flood_low)} to ${pct(r.p_flood_high)}`}</td>
-                  <td className="px-3 py-2"><div className="tabular-nums text-[12.5px]">{fmtRange(r.people_p10, r.people_p90, fmtInt)}</div><Range lo={r.people_p10} mid={r.people_p50} hi={r.people_p90} max={max} /></td>
+                  <td className="px-3 py-2"><div className="tabular-nums text-[13px]">{fmtRange(r.people_p10, r.people_p90, fmtInt)}</div><Range lo={r.people_p10} mid={r.people_p50} hi={r.people_p90} max={max} /></td>
                   <td className="px-3 py-2 tabular-nums">{r.people_p50 == null ? NO_DATA : `${fmtInt(r.people_p50)} to ${fmtInt(r.people_p90)}`}{r.people_p90_pct_of_district != null && <div className="text-[11.5px] text-ink-400">up to {r.people_p90_pct_of_district.toFixed(1)}% of district</div>}</td>
                   <td className="px-3 py-2 tabular-nums">{r.need_inr_p50_low == null ? NO_DATA : fmtRange(r.need_inr_p50_low, r.need_inr_p90_high, (v) => fmtMoney(v, "INR"))}</td>
                 </tr>
@@ -72,31 +72,15 @@ export default function OutlookSection() {
           </table>
         </div>
       )}
-      {q.data && <p className="mt-2 text-[12.5px] text-ink-300">Top {rows.length} of {q.data.districts_total} districts with full satellite coverage, sorted by the upper end of people exposed. Districts with partial coverage are left out, not guessed.</p>}
+      {q.data && <p className="mt-2 text-[13px] text-ink-300">Top {rows.length} of {q.data.districts_total} districts with full satellite coverage, sorted by the upper end of people exposed. Districts with partial coverage are left out, not guessed.</p>}
 
-      {s && (
-        <div className="mt-4 rounded-xl border border-ink-700/60 bg-ink-900/55 px-4 py-3">
-          <h4 className="text-[13.5px] font-medium text-ink-100">How well did it do on years it had not seen? ({m.data.test_years.join(", ")})</h4>
-          <div className="mt-2 overflow-x-auto">
-            <table className="w-full min-w-[560px] text-left text-[13px]">
-              <thead className="text-ink-300"><tr><th scope="col" className="py-1 pr-3 font-medium">Model</th><th scope="col" className="py-1 pr-3 font-medium">Better than plain history</th><th scope="col" className="py-1 pr-3 font-medium">Years better (of {m.data.test_years.length})</th><th scope="col" className="py-1 pr-3 font-medium">Typical miss of the middle value (people)</th></tr></thead>
-              <tbody>
-                {Object.entries(s.models).map(([k, v]) => (
-                  <tr key={k} className="border-t border-ink-700/40 text-ink-100">
-                    <th scope="row" className="py-1 pr-3 font-medium">{MODEL_NAME[k] ?? k}{s.chosen === k ? " (used)" : ""}</th>
-                    <td className="py-1 pr-3 tabular-nums">{k === "history" ? "Reference" : v.skill_vs_history == null ? NO_DATA : `${v.skill_vs_history >= 0 ? "+" : ""}${(v.skill_vs_history * 100).toFixed(1)}%`}</td>
-                    <td className="py-1 pr-3 tabular-nums">{v.years_better_than_history ?? "Reference"}</td>
-                    <td className="py-1 pr-3 tabular-nums">{fmtInt(v.mae_median_people)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="mt-2 max-w-[80ch] text-[13px] leading-relaxed text-ink-200">{(MODEL_NAME[s.chosen] && s.chosen !== "history" ? s.reason.replace(s.chosen, `"${MODEL_NAME[s.chosen]}"`) : s.reason).replace(/^./, (c) => c.toUpperCase())}. The gain over plain history is small, so read this as "the record, with recent years counted more", not as a sharp prediction.</p>
-          {cal && <p className="mt-1 max-w-[80ch] text-[13px] leading-relaxed text-ink-200">Ranges: the raw 10-to-90 range held the real value {pct(cal.coverage_raw)} of the time (target 80%). Widening by {cal.k} times gives {pct(cal.coverage_after_widening_same_years)} on the same years. Check on later years, with the widening fitted on earlier years only: {pct(cal.coverage_late_years_with_early_k)}.</p>}
-        </div>
+      {s && s.models[s.chosen] && (
+        <div className="mt-4"><Bento>
+          <BentoCard title="Model used" value={MODEL_NAME[s.chosen] ?? s.chosen} sub={`Tested on years it had not seen: ${m.data.test_years.join(", ")}`} className="md:col-span-2 lg:col-span-4" />
+          <BentoCard title="Better than plain history" value={s.chosen === "history" ? "Reference" : `${s.models[s.chosen].skill_vs_history >= 0 ? "+" : ""}${(s.models[s.chosen].skill_vs_history * 100).toFixed(1)}%`} sub="A small gain: read this as the record with recent years counted more, not a sharp prediction." className="md:col-span-2 lg:col-span-4" />
+          <BentoCard title="Years better" value={s.chosen === "history" ? "Reference" : `${s.models[s.chosen].years_better_than_history} of ${m.data.test_years.length}`} sub="Test years where it beat plain history." className="md:col-span-2 lg:col-span-4" />
+        </Bento></div>
       )}
-      {m.data && <ul className="mt-3 max-w-[80ch] list-disc pl-5 text-[13px] leading-relaxed text-ink-300">{m.data.limits.map((x) => <li key={x}>{x}</li>)}</ul>}
     </section>
   );
 }

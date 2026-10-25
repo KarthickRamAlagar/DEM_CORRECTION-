@@ -8,6 +8,17 @@ function frameOf(scene, W) {
   const H = Math.round((W * (n - s)) / ((e - w) * k));
   return { W, H, px: (lon) => ((lon - w) / (e - w)) * W, py: (lat) => ((n - lat) / (n - s)) * H };
 }
+// Server pictures come as PNG with see-through parts: put them on the page colour and save as JPEG (much smaller file).
+export function pngToJpeg(url, q = 0.85) {
+  return new Promise((resolve) => {
+    const im = new Image();
+    im.onload = () => {
+      try { const c = mk(im.naturalWidth, im.naturalHeight), x = c.getContext("2d"); x.fillStyle = "rgb(242,244,247)"; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0); resolve(c.toDataURL("image/jpeg", q)); } catch { resolve(url); }
+    };
+    im.onerror = () => resolve(url);
+    im.src = url;
+  });
+}
 const mk = (W, H) => { const c = document.createElement("canvas"); c.width = W; c.height = H; return c; };
 
 function hillshade(scene, dem, f) {
@@ -49,7 +60,7 @@ function finish(c, scene, f) {
   x.strokeStyle = "#0b1016"; x.lineWidth = Math.max(2, f.W / 300); x.setLineDash([f.W / 60, f.W / 80]); x.beginPath(); x.arc(cx, cy, rpx, 0, Math.PI * 2); x.stroke(); x.setLineDash([]);
   x.fillStyle = "#facc15"; x.strokeStyle = "#0b1016"; x.lineWidth = 3; x.beginPath(); x.arc(cx, cy, f.W / 90, 0, Math.PI * 2); x.fill(); x.stroke();
   x.strokeStyle = "#0b1016"; x.lineWidth = 4; x.strokeRect(0, 0, f.W, f.H);
-  return c.toDataURL("image/png");
+  return c.toDataURL("image/jpeg", 0.85);   // opaque map: JPEG is about 5 times smaller than PNG
 }
 const base = (scene, dem, f) => { const c = hillshade(scene, dem, f); c.getContext("2d").globalAlpha = 1; return c; };
 

@@ -153,7 +153,8 @@ function scatterPair(f, e, title, getXY, xl, yl, lineFn) {
     plotBox(d, x0, y, w, h, xr, yr, xl, yl);
     if (lineFn) { const [a, b] = lineFn(xr, yr); d.setDrawColor(120, 130, 145); d.setLineDashPattern([1.2, 1.2], 0); d.line(x0 + ((a[0] - xr[0]) / (xr[1] - xr[0])) * w, y + h - ((a[1] - yr[0]) / (yr[1] - yr[0])) * h, x0 + ((b[0] - xr[0]) / (xr[1] - xr[0])) * w, y + h - ((b[1] - yr[0]) / (yr[1] - yr[0])) * h); d.setLineDashPattern([], 0); }
     d.setFillColor(...(k === "random" ? COL.blue : COL.blue.map((v) => v)));
-    xs.forEach((vx, j) => { const vy = ys[j]; if (vx < xr[0] || vx > xr[1] || vy < yr[0] || vy > yr[1]) return; d.circle(x0 + ((vx - xr[0]) / (xr[1] - xr[0])) * w, y + h - ((vy - yr[0]) / (yr[1] - yr[0])) * h, 0.35, "F"); });
+    const step = Math.max(1, Math.ceil(xs.length / 800));      // at most about 800 dots per plot: same picture, smaller file
+    xs.forEach((vx, j) => { if (j % step) return; const vy = ys[j]; if (vx < xr[0] || vx > xr[1] || vy < yr[0] || vy > yr[1]) return; d.circle(x0 + ((vx - xr[0]) / (xr[1] - xr[0])) * w, y + h - ((vy - yr[0]) / (yr[1] - yr[0])) * h, 0.35, "F"); });
     d.setFontSize(7); d.setTextColor(...COL.grey); d.text(k === "random" ? "Random split" : "Spatial split", x0, y - 0.8);
   });
   f.y += h + 11;

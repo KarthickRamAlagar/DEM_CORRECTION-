@@ -5,12 +5,26 @@ import "leaflet/dist/leaflet.css";
 import MapFurniture from "./MapFurniture";
 import { DARK_BASEMAP_URL, DARK_BASEMAP_ATTRIBUTION } from "../ImageryOverlayLayer";
 import { fetchRegionMaps, fmtInt, fmtPct, NO_DATA } from "../../lib/sdgApi";
-import { Banner, Segmented, DataTable } from "./Ui";
+import { Banner, Segmented, DataTable, Bento, BentoCard, plainText } from "./Ui";
 
 const BOX = [[25.4, 81.9], [28.0, 84.0]];
 const COUNTRIES = [{ id: "NPL", label: "Nepal" }, { id: "IND", label: "India" }, { id: "ALL", label: "Both" }];
 const VIEWS = [{ id: "side", label: "Side by side" }, { id: "diff", label: "Where they differ" }];
 const NAME = { NPL: "Nepal", IND: "India" };
+
+// A map that is created while its box is still changing size (switching between one and two maps) can draw only part of itself.
+// Re-measure it when it is added and every time its box changes size.
+function FitSize() {
+  const map = useMap();
+  useEffect(() => {
+    const el = map.getContainer(), fit = () => map.invalidateSize();
+    const t = setTimeout(fit, 0);
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(fit) : null;
+    ro?.observe(el);
+    return () => { clearTimeout(t); ro?.disconnect(); };
+  }, [map]);
+  return null;
+}
 
 // keeps two maps on the same centre and zoom
 function ViewSync({ id, view, setView }) {
@@ -27,7 +41,7 @@ function ViewSync({ id, view, setView }) {
 function FloodMap({ id, title, image, bounds, view, setView, point, radiusKm, height }) {
   return (
     <figure className="min-w-0">
-      <figcaption className="mb-2 text-[14px] font-medium text-white">{title}</figcaption>
+      <figcaption className="mb-2 text-[13px] font-medium text-white">{title}</figcaption>
       <div className="overflow-hidden rounded-xl border border-ink-700/60" style={{ height }}>
         <MapContainer bounds={BOX} boundsOptions={{ padding: [6, 6] }} zoomSnap={0.25} zoomDelta={0.5} style={{ height: "100%", width: "100%" }}>
           <TileLayer url={DARK_BASEMAP_URL} attribution={DARK_BASEMAP_ATTRIBUTION} />
@@ -36,10 +50,23 @@ function FloodMap({ id, title, image, bounds, view, setView, point, radiusKm, he
           <ImageOverlay url={`data:image/png;base64,${image}`} bounds={bounds} opacity={0.95} />
           {point && <Circle center={[point.lat, point.lng]} radius={(radiusKm ?? 10) * 1000} pathOptions={{ color: "#facc15", weight: 2, fill: false }} />}
           {point && <CircleMarker center={[point.lat, point.lng]} radius={4} pathOptions={{ color: "#facc15", fillColor: "#facc15", fillOpacity: 1 }} />}
+          <FitSize />
           <ViewSync id={id} view={view} setView={setView} />
         </MapContainer>
       </div>
     </figure>
+  );
+}
+
+const NOTE_TITLES = [[/satellite/i, "Checked against satellite"], [/farther|from a mapped river/i, "Coverage"], [/cells|arc-second/i, "Map cells"]];
+function NoteGrid({ label, notes }) {
+  const items = [{ t: "What this shows", x: label }, ...notes.map((n) => ({ t: NOTE_TITLES.find(([re]) => re.test(n))?.[1] ?? "How to read", x: n })), { t: "People", x: "People exposed use the 2020 WorldPop estimate. Exposure is not casualties or damage." }];
+  return (
+    <div className="mt-4">
+      <Bento>
+        {items.map((it) => <BentoCard key={it.t + it.x} title={it.t} className="md:col-span-3 lg:col-span-4"><p className="mt-1.5 text-[13px] leading-relaxed text-ink-100">{plainText(it.x)}</p></BentoCard>)}
+      </Bento>
+    </div>
   );
 }
 
@@ -62,16 +89,16 @@ export default function RegionFloodMaps({ point, radiusKm, defaultRise = 2, defa
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
         <Segmented label="Country" options={COUNTRIES} value={country} onChange={setCountry} />
         <Segmented label="Map view" options={VIEWS} value={mode} onChange={setMode} />
-        <label className="flex items-center gap-2 text-[13.5px] text-ink-200">
+        <label className="flex items-center gap-2 text-[13px] text-ink-200">
           River rises by
-          <select value={rise} onChange={(e) => setRise(Number(e.target.value))} className="rounded-lg border border-ink-600 bg-ink-800 px-2.5 py-1.5 text-[13.5px] text-white">
+          <select value={rise} onChange={(e) => setRise(Number(e.target.value))} className="rounded-lg border border-ink-600 bg-ink-800 px-2.5 py-1.5 text-[13px] text-white">
             {(d?.rises ?? [0.5, 1, 2, 3, 4, 6, 8, 10]).map((r) => <option key={r} value={r}>{r} m</option>)}
           </select>
         </label>
       </div>
 
       {q.isError && <div className="mt-4"><Banner tone="amber">{q.error.message}</Banner></div>}
-      {!d && q.isLoading && <p className="mt-4 text-[13.5px] text-ink-300">Loading the regional maps...</p>}
+      {!d && q.isLoading && <p className="mt-4 text-[13px] text-ink-300">Loading the regional maps...</p>}
 
       {d && (
         <>
@@ -107,11 +134,7 @@ export default function RegionFloodMaps({ point, radiusKm, defaultRise = 2, defa
               ]}
             />
           </div>
-          <div className="mt-3 space-y-1 text-[13px] leading-relaxed text-ink-300 max-w-3xl">
-            <p>{d.label}</p>
-            {d.notes.map((n) => <p key={n}>{n}</p>)}
-            <p>People exposed use the 2020 WorldPop estimate. Exposure is not casualties or damage.</p>
-          </div>
+          <NoteGrid label={d.label} notes={d.notes} />
         </>
       )}
     </div>

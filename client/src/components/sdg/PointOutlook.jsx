@@ -22,7 +22,7 @@ function Fact({ label, value, sub }) {
     <div className="min-w-0">
       <dt className="text-[13px] text-ink-300">{label}</dt>
       <dd className="mt-0.5 text-[15px] text-white break-words tabular-nums">{value}</dd>
-      {sub && <dd className="mt-0.5 text-[12px] text-ink-400">{sub}</dd>}
+      {sub && <dd className="mt-0.5 text-[13px] text-ink-400">{sub}</dd>}
     </div>
   );
 }
@@ -44,7 +44,7 @@ export default function PointOutlook({ point, seed, rise, season, onSeason }) {
     <div>
       <h3 className="mt-8 mb-3 text-[16px] font-semibold text-white">Will it flood here? Outlook for a typical coming year</h3>
       {o.isError && <Banner tone="amber">{o.error.message} The what-if steps below still work.</Banner>}
-      {!d && !o.isError && <p className="text-[13.5px] text-ink-300">Checking the satellite record for this place...</p>}
+      {!d && !o.isError && <p className="text-[13px] text-ink-300">Checking the satellite record for this place...</p>}
       {d && (
         <div className={`rounded-xl border-l-[3px] ${band.tone} bg-ink-900/50 p-5`}>
           <div className="flex items-center gap-2 text-[16px] font-semibold text-white"><Icon size={18} aria-hidden /> {band.label}: {d.verdict.text}</div>
@@ -82,9 +82,9 @@ export default function PointOutlook({ point, seed, rise, season, onSeason }) {
         </div>
       )}
       {!hasZ && d && d.hand.raw == null && d.hand.corrected == null && <Banner>No mapped river within about 12 km of this spot, so there is no river-height value and no flood status is given. The satellite record above still applies.</Banner>}
-      {!hasZ && d && (d.hand.raw != null || d.hand.corrected != null) && <p className="mt-2 text-[12.5px] text-ink-400">Want the elevation from the DEM engine for this exact point? Use New Inputs.</p>}
+      {!hasZ && d && (d.hand.raw != null || d.hand.corrected != null) && <p className="mt-2 text-[13px] text-ink-400">Want the elevation from the DEM engine for this exact point? Use New Inputs.</p>}
       {hasZ && pq.isError && <Banner tone="amber">Point check: {pq.error.message}</Banner>}
-      {hasZ && !pq.isError && !p && <p className="text-[13.5px] text-ink-300">Checking the point...</p>}
+      {hasZ && !pq.isError && !p && <p className="text-[13px] text-ink-300">Checking the point...</p>}
       {hasZ && p && (
         <div className="rounded-xl border border-ink-700/60 bg-ink-900/50 p-5">
           <dl className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4">
@@ -93,7 +93,7 @@ export default function PointOutlook({ point, seed, rise, season, onSeason }) {
             <Fact label="Height above the nearest river" value={p.adjusted ? (p.adjusted.has_interval ? `${m2(p.adjusted.low)} to ${m2(p.adjusted.high)}` : m2(p.adjusted.mid)) : NO_DATA} />
             <Fact label="Does the river rise decide it?" value={p.adjusted && p.by_rise.length ? (new Set(p.by_rise.map((r) => kindOf(r.status))).size > 1 ? "Yes, it depends on the rise" : "No, same at every rise tested") : NO_DATA} />
           </dl>
-          {p.message && <p className="mt-3 text-[13.5px] text-signal-amber">{p.message}</p>}
+          {p.message && <p className="mt-3 text-[13px] text-signal-amber">{p.message}</p>}
           {p.by_rise.length > 0 && (
             <ul className="mt-4 flex flex-wrap gap-2 list-none p-0">
               {p.by_rise.map((r) => (

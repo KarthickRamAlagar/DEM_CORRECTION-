@@ -17,8 +17,8 @@ export default function DistrictMap({ metric, year, bound, coveredOnly, country 
   const geo = useQuery({ queryKey: ["sdg-geojson"], queryFn: fetchSdgGeojson, staleTime: Infinity });
   const map = useQuery({ queryKey: ["sdg-map", year, bound, coveredOnly], queryFn: () => fetchSdgMap({ year, bound, covered_only: coveredOnly }) });
   const m = METRICS[metric];
-  if (geo.isError || map.isError) return <div className="text-[12px] text-signal-amber">The district map could not be loaded.</div>;
-  if (!geo.data || !map.data) return <div className="text-[12px] text-ink-400">Loading map...</div>;
+  if (geo.isError || map.isError) return <div className="text-[13px] text-signal-amber">The district map could not be loaded.</div>;
+  if (!geo.data || !map.data) return <div className="text-[13px] text-ink-400">Loading map...</div>;
 
   const rows = Object.fromEntries(map.data.rows.filter((r) => r.iso === country).map((r) => [r.did, r]));
   const values = Object.values(rows).map((r) => r[m.field]).filter((v) => v != null);
@@ -44,7 +44,7 @@ export default function DistrictMap({ metric, year, bound, coveredOnly, country 
           />
         </MapContainer>
       </div>
-      <div className="flex flex-wrap items-center gap-3 border-t border-ink-700/60 bg-ink-900/60 px-3 py-2 text-[11px] text-ink-300">
+      <div className="flex flex-wrap items-center gap-3 border-t border-ink-700/60 bg-ink-900/60 px-3 py-2 text-[12px] text-ink-300">
         <span className="font-medium text-ink-100">{m.label}</span>
         <span className="flex items-center gap-1">{RAMP.map((c) => <span key={c} className="inline-block h-2.5 w-5" style={{ background: c }} />)} low to high (max {m.fmt(max)})</span>
         <span className="flex items-center gap-1"><span className="inline-block h-2.5 w-5" style={{ background: "#6b7280" }} /> No data</span>

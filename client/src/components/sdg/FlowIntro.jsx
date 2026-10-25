@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, Compass, Lock, Smartphone, PlayCircle } from "lucide-react";
+import { ArrowRight, Compass, Lock, Monitor, PlayCircle } from "lucide-react";
 import { FLOW_STEPS } from "../../lib/flowSteps";
 import { SdgChip } from "./Ui";
 
@@ -36,7 +36,7 @@ function Schematic() {
       <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-[13px] text-ink-100">
         <Key color="#f59e0b" dash="6 4">Raw model</Key><Key color="#14b8a6">Corrected model</Key><Key color="#2563eb" dash="4 3">Water line</Key>
       </div>
-      <figcaption className="mt-2 text-[12.5px] leading-relaxed text-ink-300">Schematic with invented shapes, to explain the idea. It does not say which model is right, and it is not measured data.</figcaption>
+      <figcaption className="mt-2 text-[13px] leading-relaxed text-ink-300">Schematic with invented shapes, to explain the idea. It does not say which model is right, and it is not measured data.</figcaption>
     </figure>
   );
 }
@@ -48,8 +48,8 @@ export default function FlowIntro({ onStart, onExplore }) {
     <div className="rounded-xl border border-ink-700/60 bg-ink-900/50 p-5">
       <div className="flex flex-wrap items-center gap-3"><h3 className="text-[17px] font-semibold text-white">{s.title}</h3><SdgChip goal={s.sdg} /></div>
       <dl className="mt-3 grid gap-4 sm:grid-cols-2">
-        <div><dt className="text-[13px] text-ink-300">What you see</dt><dd className="mt-1 text-[14.5px] leading-relaxed text-ink-100">{s.what}</dd></div>
-        <div><dt className="text-[13px] text-ink-300">What you do</dt><dd className="mt-1 text-[14.5px] leading-relaxed text-ink-100">{s.you}</dd></div>
+        <div><dt className="text-[13px] text-ink-300">What you see</dt><dd className="mt-1 text-[13px] leading-relaxed text-ink-100">{s.what}</dd></div>
+        <div><dt className="text-[13px] text-ink-300">What you do</dt><dd className="mt-1 text-[13px] leading-relaxed text-ink-100">{s.you}</dd></div>
       </dl>
     </div>
   );
@@ -62,15 +62,15 @@ export default function FlowIntro({ onStart, onExplore }) {
             Take one place from a corrected elevation to a recovery estimate in seven short pages. Raw and corrected elevation models are run side by side, so you can see what the correction changes.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
-            <button type="button" onClick={onStart} className="inline-flex items-center gap-2 rounded-lg border border-signal-teal/60 bg-signal-teal px-5 py-3 text-[14.5px] font-semibold text-ink-950 hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal-teal">
+            <button type="button" onClick={onStart} className="inline-flex items-center gap-2 rounded-lg border border-signal-teal/60 bg-signal-teal px-5 py-3 text-[13px] font-semibold text-ink-950 hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal-teal">
               <PlayCircle size={18} /> Start the guided flow <ArrowRight size={16} />
             </button>
-            <button type="button" onClick={onExplore} className="inline-flex items-center gap-2 rounded-lg border border-ink-600 px-5 py-3 text-[14.5px] font-medium text-ink-100 hover:border-ink-500 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-signal-teal">
+            <button type="button" onClick={onExplore} className="inline-flex items-center gap-2 rounded-lg border border-ink-600 px-5 py-3 text-[13px] font-medium text-ink-100 hover:border-ink-500 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-signal-teal">
               <Compass size={18} /> Explore whole regions
             </button>
           </div>
-          <p className="mt-6 max-w-xl border-l-[3px] border-signal-teal/70 pl-3.5 text-[13.5px] leading-relaxed text-ink-200">
-            A what-if from terrain height, not a forecast. An estimate for planning, not a release decision. India and the Nepal Terai.
+          <p className="mt-6 max-w-xl border-l-[3px] border-signal-teal/70 pl-3.5 text-[13px] leading-relaxed text-ink-200">
+            A what-if from terrain height, not a forecast. An estimate for planning, not a release decision. India and the southern plains of Nepal.
           </p>
         </div>
         <Schematic />
@@ -78,20 +78,20 @@ export default function FlowIntro({ onStart, onExplore }) {
 
       <section className="mt-14" aria-labelledby="route-h">
         <h2 id="route-h" className="text-[20px] font-semibold text-white">The seven pages</h2>
-        <p className="mt-1 text-[14px] text-ink-200">Select a page to see what it shows and what you do there.</p>
+        <p className="mt-1 text-[13px] text-ink-200">Select a page to see what it shows and what you do there.</p>
         <ol className="relative mt-6 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2 lg:grid-cols-7 lg:gap-3">
-          <span aria-hidden className="absolute left-[34px] right-[34px] top-[22px] hidden h-px bg-ink-700 lg:block" />
+          <span aria-hidden className="absolute left-[7.14%] right-[7.14%] top-[32px] hidden h-px bg-ink-700 lg:block" />
           {FLOW_STEPS.map((s, i) => {
             const Icon = s.icon;
             const on = i === sel;
             return (
               <li key={s.id} className="relative">
                 <button type="button" onClick={() => setSel(i)} aria-pressed={on} aria-controls="route-detail"
-                  className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-signal-teal lg:flex-col lg:items-start lg:px-1 ${on ? "bg-ink-850/80" : "hover:bg-ink-850/50"}`}>
+                  className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-signal-teal lg:flex-col lg:items-center lg:px-1 lg:text-center ${on ? "bg-ink-850/80" : "hover:bg-ink-850/50"}`}>
                   <span className={`relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border ${on ? "border-signal-teal bg-signal-teal text-ink-950" : "border-ink-600 bg-ink-900 text-signal-teal"}`}><Icon size={19} /></span>
                   <span className="min-w-0">
-                    <span className={`block text-[14px] leading-snug ${on ? "font-semibold text-white" : "text-ink-100"}`}>{s.title}</span>
-                    {s.sdg && <span className="mt-0.5 block"><SdgChip goal={s.sdg} /></span>}
+                    <span className={`block text-[13px] leading-snug ${on ? "font-semibold text-white" : "text-ink-100"}`}>{s.title}</span>
+                    {s.sdg && <span className="mt-0.5 flex lg:justify-center"><SdgChip goal={s.sdg} /></span>}
                   </span>
                 </button>
                 {on && <div className="mt-2 lg:hidden"><Detail s={s} /></div>}
@@ -106,12 +106,12 @@ export default function FlowIntro({ onStart, onExplore }) {
         {[
           { Icon: Lock, t: "Inputs lock when you start", d: "The place and the river rise stay fixed for the run. You can go back to pages you have seen, and forward with Next." },
           { Icon: Compass, t: "Explore keeps nothing locked", d: "Regional tables and flood maps, for looking around without a single place." },
-          { Icon: Smartphone, t: "Works on any screen", d: "Phones, tablets and desktops. 3D runs in browsers. XR needs a WebXR device and comes later." },
+          { Icon: Monitor, t: "Built for desktop and laptop", d: "Use Chrome or Edge on a desktop or laptop. 3D runs in the browser. XR needs a WebXR headset and comes later." },
         ].map(({ Icon, t, d }) => (
           <div key={t} className="bg-ink-950 p-5">
             <Icon size={18} className="text-signal-teal" aria-hidden />
             <h3 className="mt-3 text-[15px] font-semibold text-white">{t}</h3>
-            <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-200">{d}</p>
+            <p className="mt-1.5 text-[13px] leading-relaxed text-ink-200">{d}</p>
           </div>
         ))}
       </section>

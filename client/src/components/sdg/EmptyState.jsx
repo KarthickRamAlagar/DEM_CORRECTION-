@@ -13,7 +13,7 @@ export default function EmptyState({ emoji = "☀️", title, children, facts = 
         </span>
         <div className="min-w-0 mt-4 sm:mt-0">
           <h3 className={`${compact ? "text-[17px]" : "text-[21px]"} font-semibold leading-snug text-white`}>{title}</h3>
-          <div className="mt-2 max-w-2xl text-[14.5px] leading-relaxed text-ink-100">{children}</div>
+          <div className="mt-2 max-w-2xl text-[13px] leading-relaxed text-ink-100">{children}</div>
         </div>
       </div>
       {facts.length > 0 && (
@@ -28,15 +28,15 @@ export default function EmptyState({ emoji = "☀️", title, children, facts = 
           {actions.map((a) => (
             <button key={a.label} ref={a.ref} type="button" onClick={a.onClick}
               className={a.primary
-                ? "inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-[14px] font-semibold text-ink-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-signal-teal"
-                : "inline-flex items-center gap-2 rounded-lg border border-ink-600 px-4 py-2.5 text-[14px] font-medium text-ink-100 hover:text-white hover:border-ink-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-signal-teal"}
+                ? "inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-[13px] font-semibold text-ink-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-signal-teal"
+                : "inline-flex items-center gap-2 rounded-lg border border-ink-600 px-4 py-2.5 text-[13px] font-medium text-ink-100 hover:text-white hover:border-ink-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-signal-teal"}
               style={a.primary ? { background: GOLD } : undefined}>
               {a.back && <ArrowLeft size={15} />}{a.label}
             </button>
           ))}
         </div>
       )}
-      {detail && <p className="mt-5 text-[12.5px] leading-relaxed text-ink-300 break-words">Reason given by the server: {detail}</p>}
+      {detail && <p className="mt-5 text-[13px] leading-relaxed text-ink-300 break-words">Reason given by the server: {detail}</p>}
     </section>
   );
 }

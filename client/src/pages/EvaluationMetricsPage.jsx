@@ -42,10 +42,10 @@ export default function EvaluationMetricsPage() {
     try { return buildEval(bench); } catch { return null; }
   }, [bench]);
 
-  const downloadPdf = () => {
+  const downloadPdf = async () => {
     if (!e) return;
     try {
-      generateEvalPdf({ e, spatial });
+      await generateEvalPdf({ e, spatial });
       setPdfMsg("PDF downloaded");
     } catch (err) {
       setPdfMsg("Could not create the PDF");

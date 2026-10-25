@@ -13,7 +13,7 @@ export default function PhysicsPilotCard() {
   return (
     <section className="mt-6 rounded-xl border border-ink-700 bg-ink-850/60 p-5" aria-label="Physics flood pilot">
       <h3 className="text-[16px] font-semibold text-white">Water movement over time (pilot)</h3>
-      <p className="mt-1 max-w-3xl text-[13.5px] leading-relaxed text-ink-200">
+      <p className="mt-1 max-w-3xl text-[13px] leading-relaxed text-ink-200">
         On a small window, a physics model let a rising river spread over the ground and compared the flooded area with satellite flood scenes. It matched {d.events_won} of {d.events_scored} scenes better than the terrain what-if, a flood-everything map and a random map of the same flooded area.
         These scenes were not used to choose the model settings. This is a pilot on one window. It is not a forecast and does not change any number elsewhere in the app.
       </p>
@@ -25,7 +25,7 @@ export default function PhysicsPilotCard() {
           </tbody>
         </table>
       </div>
-      <p className="mt-2 text-[12.5px] text-ink-400">Overlap = area flooded in both the model and the satellite scene, divided by the area flooded in either. {d.assumptions?.join(" ")}{ce != null ? ` Using the corrected elevation instead of the raw one changed the physics overlap by ${(ce * 100).toFixed(1)} points on average.` : ""}</p>
+      <p className="mt-2 text-[13px] text-ink-400">Overlap = area flooded in both the model and the satellite scene, divided by the area flooded in either. {d.assumptions?.join(" ")}{ce != null ? ` Using the corrected elevation instead of the raw one changed the physics overlap by ${(ce * 100).toFixed(1)} points on average.` : ""}</p>
     </section>
   );
 }
