@@ -30,11 +30,11 @@ export function newestMtime(dir, depth = 3) {
   return best === null ? null : new Date(best).toISOString();
 }
 
-export function createHealthService({ cfg, upstream, metrics, cache }) {
+export function createHealthService({ cfg, upstream, metrics, cache, services }) {
   const disk = () => { try { const s = fs.statfsSync(cfg.repoRoot); return { path: cfg.repoRoot, total_gb: +(s.blocks * s.bsize / 1e9).toFixed(1), free_gb: +(s.bavail * s.bsize / 1e9).toFixed(1) }; } catch { return null; } };
   return {
     async snapshot() {
-      const mem = process.memoryUsage(), up = await upstream.ping();
+      const mem = process.memoryUsage(), [up, svc] = await Promise.all([upstream.ping(), services ? services.snapshot() : []]);
       cpuPercent(); await new Promise((r) => setTimeout(r, 250));
       return {
         time: new Date().toISOString(),
@@ -42,6 +42,7 @@ export function createHealthService({ cfg, upstream, metrics, cache }) {
         gateway: { uptime_s: Math.round(process.uptime()), rss_mb: Math.round(mem.rss / 1e6), heap_mb: Math.round(mem.heapUsed / 1e6), event_loop_p99_ms: +(loop.percentile(99) / 1e6).toFixed(1), cache: cache.kind() },
         api: metrics.summary(),
         upstream: up,
+        services: svc,
       };
     },
     pipeline() {

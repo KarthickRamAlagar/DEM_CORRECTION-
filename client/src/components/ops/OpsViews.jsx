@@ -279,7 +279,7 @@ export function SystemView({ health, pipeline, history }) {
     ["Gateway", h ? "Running" : null, h ? `up ${Math.floor(gw.uptime_s / 60)} min` : null, "green"],
     ["Python analysis service", h ? (h.upstream?.ok ? "Answering" : "Not answering") : null, h?.upstream ? `${h.upstream.ms} ms` : null, h?.upstream?.ok ? "green" : "red"],
     ["Cache", gw ? (gw.cache === "redis" ? "Redis in use" : "In memory") : null, gw?.cache === "redis" ? null : "Redis is not configured", gw?.cache === "redis" ? "green" : "amber"],
-    ["PostgreSQL / PostGIS", null, "not connected to this page yet", "grey"],
+    ...(h?.services?.length ? h.services.map((s) => [s.name, s.ok === null ? "Not checked" : s.ok ? "Answering" : "Not running", `${s.detail || ""}${s.ok && s.ms != null ? ` (${s.ms} ms)` : ""}`, s.ok === null ? "grey" : s.ok ? "green" : "amber"]) : [["PostgreSQL / PostGIS and the other services", null, "gateway older than patch 8c, or service checks are off", "grey"]]),
     ["ML pipeline (idle or running)", null, "no job runner to read", "grey"],
   ];
   return (

@@ -6,6 +6,7 @@ import { createCache } from "./services/cacheService.js";
 import { createUpstream } from "./repositories/upstreamRepository.js";
 import { createSdgService } from "./services/sdgService.js";
 import { createHealthService } from "./services/healthService.js";
+import { createServicesService } from "./services/servicesService.js";
 import { sdgRoutes } from "./routes/sdgRoutes.js";
 import { monitorRoutes } from "./routes/monitorRoutes.js";
 
@@ -16,7 +17,7 @@ export async function createApp(cfg) {
   app.disable("x-powered-by"); app.set("trust proxy", "loopback");
   const metrics = createMetrics(), cache = await createCache({ redisUrl: cfg.REDIS_URL, ttlSeconds: cfg.CACHE_TTL_SECONDS, metrics });
   const upstream = createUpstream(cfg.UPSTREAM_URL, { onError: metrics.upstreamError });
-  const sdg = createSdgService({ upstream, cache }), health = createHealthService({ cfg, upstream, metrics, cache });
+  const sdg = createSdgService({ upstream, cache }), services = createServicesService({ cfg, metrics }), health = createHealthService({ cfg, upstream, metrics, cache, services });
 
   app.use(requestId, ...security(cfg), requestMetrics(metrics));
   app.get("/healthz", (req, res) => res.json({ ok: true }));

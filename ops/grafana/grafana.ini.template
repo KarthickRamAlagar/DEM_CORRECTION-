@@ -1,0 +1,20 @@
+; Grafana (patch 8c). Rendered by scripts/ops_services.py render. Local only, no anonymous access, no phoning home.
+[paths]
+data = {{RUN_DIR}}/grafana-data
+logs = {{RUN_DIR}}/grafana-logs
+plugins = {{RUN_DIR}}/grafana-plugins
+provisioning = {{RENDERED}}/grafana/provisioning
+[server]
+http_addr = 127.0.0.1
+http_port = {{GRAFANA_PORT}}
+[security]
+allow_embedding = false
+cookie_samesite = strict
+[auth.anonymous]
+enabled = false
+[analytics]
+reporting_enabled = false
+check_for_updates = false
+check_for_plugin_updates = false
+[users]
+allow_sign_up = false

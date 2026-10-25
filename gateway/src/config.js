@@ -23,11 +23,19 @@ const Schema = z.object({
   HEAVY_RATE_LIMIT_PER_MIN: z.coerce.number().int().min(1).default(30),
   CACHE_TTL_SECONDS: z.coerce.number().int().min(0).default(600),
   REPO_ROOT: z.string().default(".."),
+  // patch 8c: where the extra services answer (all on this computer). SERVICES_PROBE=0 switches the checks off.
+  PG_HOST: z.string().default("127.0.0.1"),
+  PG_PORT: z.coerce.number().int().min(1).max(65535).default(5432),
+  NGINX_URL: z.string().url().default("http://127.0.0.1:8081"),
+  PROMETHEUS_URL: z.string().url().default("http://127.0.0.1:9090"),
+  GRAFANA_URL: z.string().url().default("http://127.0.0.1:3000"),
+  MLFLOW_URL: z.string().url().default("http://127.0.0.1:5000"),
+  SERVICES_PROBE: z.enum(["0", "1"]).default("1"),
 });
 
 export function loadConfig(env = process.env, { dotenvFile = path.resolve(process.cwd(), ".env") } = {}) {
   if (env === process.env) loadDotenv(dotenvFile);
   const c = Schema.parse(env);
   if (c.MONITOR_SECRET && c.MONITOR_SECRET.length < 16) throw new Error("MONITOR_SECRET is too short (use at least 16 characters, or leave it empty to switch monitoring off)");
-  return { ...c, origins: c.CORS_ORIGINS.split(",").map((s) => s.trim()).filter(Boolean), repoRoot: path.resolve(process.cwd(), c.REPO_ROOT), monitorOn: c.MONITOR_SECRET.length > 0 };
+  return { ...c, origins: c.CORS_ORIGINS.split(",").map((s) => s.trim()).filter(Boolean), repoRoot: path.resolve(process.cwd(), c.REPO_ROOT), monitorOn: c.MONITOR_SECRET.length > 0, SERVICES_PROBE: c.SERVICES_PROBE === "1" };
 }

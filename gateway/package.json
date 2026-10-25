@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Security and monitoring layer in front of the DEM-Correction FastAPI backend (no login system; hidden developer routes).",
   "engines": { "node": ">=18" },
-  "scripts": { "start": "node src/server.js", "dev": "node --watch src/server.js", "test": "node --test test/gateway.test.js" },
+  "scripts": { "start": "node src/server.js", "dev": "node --watch src/server.js", "test": "node --test test/gateway.test.js test/services.test.js" },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.21.2",
